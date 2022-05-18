@@ -3,6 +3,9 @@ import './App.scss';
 import { ShoppingList } from './shopping-list/shopping-list';
 import { MiddagAppBar } from './app-bar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { SearchDinner } from './search-dinner/search-dinner';
+import { AddDinner } from './add-dinner/add-dinner';
 
 const theme = createTheme({
   palette: {
@@ -17,14 +20,19 @@ const theme = createTheme({
 
 function App() {
   return (
-    <div>
+    <BrowserRouter>
       <ThemeProvider theme={theme}>
         <MiddagAppBar/>
         <div className="App">
-          <ShoppingList></ShoppingList>
+          <Routes>
+            <Route path="/" element={<ShoppingList/>} />
+            <Route path="/list" element={<ShoppingList/>} />
+            <Route path="/search" element={<SearchDinner/>} />
+            <Route path="/add" element={<AddDinner/>} />
+          </Routes>
         </div>
       </ThemeProvider>
-    </div>
+    </BrowserRouter>
     );
 }
 

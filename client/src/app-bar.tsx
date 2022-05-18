@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 export const MiddagAppBar = () => {
   return (
@@ -24,13 +25,26 @@ export const MiddagAppBar = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 0 }}>
             Middag
           </Typography>
-          <Button
-            sx={{ my: 2, color: 'white', display: 'block', flexGrow: 0 }}
-          >
-            Search
-          </Button>
+          <Link to="/search">
+            <LinkButton title='Search'/>
+          </Link>
+          <Link to="/add">
+            <LinkButton title='Add dinner'/>
+          </Link>
+          <Link to="/list">
+            <LinkButton title='Shopping List'/>
+          </Link>
         </Toolbar>
       </AppBar>
     </Box>
+  );
+}
+
+const LinkButton = (props: {title: string}) => {
+  return (
+    <Button
+    sx={{ my: 2, color: 'white', display: 'block', flexGrow: 0 }}>
+      {props.title}
+  </Button>
   );
 }
