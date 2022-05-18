@@ -1,0 +1,14 @@
+body {
+  font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+  font-size: 20px;
+  margin: auto;
+  text-align: center;
+  background-color: "lightgrey";
+  align-content: "center";
+}
+table{
+  font-size: 12px;
+}
+card {
+  font-size: 12px;
+}
