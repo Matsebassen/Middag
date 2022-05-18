@@ -1,5 +1,5 @@
 import { Ingredient } from '../models/ingredient';
-import axios, { Axios } from  'axios';
+import axios from  'axios';
 
 const API = 'https://middagsapp.azurewebsites.net/API/MiddagsApp';
 
