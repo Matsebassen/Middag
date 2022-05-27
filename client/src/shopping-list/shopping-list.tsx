@@ -61,7 +61,7 @@ export const ShoppingList = () => {
       />
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={1000}
+        autoHideDuration={1500}
         onClose={() => setSnackbarOpen(false)}
         message={snackbarMsg}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
