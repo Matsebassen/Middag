@@ -1,0 +1,16 @@
+.dinner-card{
+  width: 345px;
+  margin: 8px;
+  .MuiCardHeader-root{
+    height: 80px;
+  }
+
+  &__header{
+    .MuiCardHeader-title{
+      font-size: 1.2rem;
+    }
+    .MuiCardHeader-subheader{
+      font-size: 0.8rem;
+    }
+  }
+}

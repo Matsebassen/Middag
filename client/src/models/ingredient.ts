@@ -1,6 +1,6 @@
 export type Ingredient = {
-  name: string,
-  haveBought: boolean,
-  id: number,
-  desc: string
-};
+  name: string;
+  qty: string;
+  unit: string;
+  id?: number;
+}

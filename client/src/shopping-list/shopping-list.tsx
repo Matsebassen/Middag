@@ -2,7 +2,7 @@ import './shopping-list.scss';
 
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
-import { Ingredient } from '../models/ingredient';
+import { ShopItem } from '../models/shopItem';
 import { ShoppingItem } from './shopping-item';
 import { TextField } from '@mui/material';
 import { addIngredient, editIngredient } from './shopping-list-service';
@@ -18,24 +18,7 @@ export const ShoppingList = () => {
     { refreshInterval: 2000 }
   );
 
-  const GroceryList = (props: { ingredients: Ingredient[], haveBought: boolean }) => {
-    return (
-      <div className="shopping-list">
-        {props.ingredients && props.ingredients
-          .filter(grocery => grocery.haveBought === props.haveBought)
-          .map(grocery =>
-            <ShoppingItem
-              ingredient={grocery}
-              key={grocery.id}
-              editIngredient={onEditIngredient}
-              isEditing={ editingIngredient === grocery.id}
-              setEdit={setEditingIngredient}/>
-          )}
-      </div>
-    );
-  };
-
-  const onEditIngredient = async (ingredient: Ingredient) => {
+  const onEditIngredient = async (ingredient: ShopItem) => {
     setEditingIngredient(0);
     const ingredients = await editIngredient(ingredient);
     mutateIngredients(ingredients);
@@ -58,10 +41,41 @@ export const ShoppingList = () => {
                  onKeyDown={(e) => onAddIngredient(e)}
                  variant="outlined"/>
       <GroceryList ingredients={ingredients}
-                   haveBought={false}/>
+                   haveBought={false}
+                   editingIngredient={editingIngredient}
+                   setEditingIngredient={setEditingIngredient}
+                   onEditIngredient={onEditIngredient}
+      />
       <h4>Recently used:</h4>
       <GroceryList ingredients={ingredients}
-                   haveBought={true}/>
+                   haveBought={true}
+                   editingIngredient={editingIngredient}
+                   setEditingIngredient={setEditingIngredient}
+                   onEditIngredient={onEditIngredient}
+      />
+    </div>
+  );
+};
+
+const GroceryList = (props: {
+  ingredients: ShopItem[],
+  haveBought: boolean,
+  editingIngredient: number,
+  setEditingIngredient: (id: number) => void,
+  onEditIngredient: (ingredient: ShopItem) => void
+}) => {
+  return (
+    <div className="shopping-list">
+      {props.ingredients && props.ingredients
+        .filter(grocery => grocery.haveBought === props.haveBought)
+        .map(grocery =>
+          <ShoppingItem
+            ingredient={grocery}
+            key={grocery.id}
+            editIngredient={props.onEditIngredient}
+            isEditing={ props.editingIngredient === grocery.id}
+            setEdit={props.setEditingIngredient}/>
+        )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import './shopping-item.scss';
-import { Ingredient } from '../models/ingredient';
+import { ShopItem } from '../models/shopItem';
 
 import { Card, CardActions, CardContent, IconButton, Input } from '@mui/material';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
@@ -10,9 +10,9 @@ import { useTheme } from '@mui/material/styles';
 
 
 export const ShoppingItem = (props: {
-  ingredient: Ingredient,
+  ingredient: ShopItem,
   isEditing: boolean,
-  editIngredient: (ingredient: Ingredient) => void,
+  editIngredient: (ingredient: ShopItem) => void,
   setEdit: (id: number) => void
 }) => {
   const theme = useTheme();
@@ -24,13 +24,8 @@ export const ShoppingItem = (props: {
   const spanStyle = {
     fontSize: calculateFontSize(props.ingredient.name)
 }
-
-  const editIngredient = (ingredient: Ingredient) => {
-    props.editIngredient(ingredient);
-  }
-
   return (
-    <Card className="shopping-item" onClick={() => editIngredient({
+    <Card className="shopping-item" onClick={() => props.editIngredient({
       ...props.ingredient,
       haveBought: !props.ingredient.haveBought })}>
       <CardContent
@@ -47,7 +42,7 @@ export const ShoppingItem = (props: {
         <IngredientDescription
           ingredient={props.ingredient}
           isEditing={props.isEditing}
-          editIngredient={editIngredient}
+          editIngredient={props.editIngredient}
           setEdit={props.setEdit}/>
       </CardActions>
     </Card>
@@ -55,9 +50,9 @@ export const ShoppingItem = (props: {
 }
 
 const IngredientDescription = (props:{
-  ingredient: Ingredient,
+  ingredient: ShopItem,
   isEditing: boolean,
-  editIngredient: (ingredient: Ingredient) => void,
+  editIngredient: (ingredient: ShopItem) => void,
   setEdit: (id: number) => void
 }) => {
   const [ingredientDesc, setIngredientDesc] = useState(props.ingredient.desc);

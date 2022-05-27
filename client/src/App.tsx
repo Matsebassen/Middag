@@ -5,7 +5,7 @@ import { MiddagAppBar } from './app-bar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { SearchDinner } from './search-dinner/search-dinner';
-import { AddDinner } from './add-dinner/add-dinner';
+import AddDinner from './add-dinner/add-dinner';
 
 const theme = createTheme({
   palette: {
