@@ -23,11 +23,14 @@ export const ShoppingItem = (props: {
 
   const spanStyle = {
     fontSize: calculateFontSize(props.ingredient.name)
-}
+  };
+  const toggleHaveBought = (ingredient: ShopItem) => {
+    props.editIngredient({ ...ingredient, haveBought: !ingredient.haveBought });
+  };
+
   return (
-    <Card className="shopping-item" onClick={() => props.editIngredient({
-      ...props.ingredient,
-      haveBought: !props.ingredient.haveBought })}>
+    <Card className="shopping-item"
+          onClick={() => toggleHaveBought(props.ingredient)}>
       <CardContent
         sx={{ backgroundColor }}
         className="shopping-item__content">
@@ -105,3 +108,4 @@ const calculateFontSize = (name: string) => {
   }
   return fontSize;
 }
+

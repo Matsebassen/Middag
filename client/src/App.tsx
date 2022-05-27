@@ -26,9 +26,12 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/" element={<ShoppingList/>} />
-            <Route path="/list" element={<ShoppingList/>} />
-            <Route path="/search" element={<SearchDinner/>} />
-            <Route path="/add" element={<AddDinner/>} />
+            <Route path="/list"
+                   element={<ShoppingList/>}/>
+            <Route path="/search"
+                   element={<SearchDinner/>}/>
+            <Route path="/add"
+                   element={<AddDinner/>}/>
           </Routes>
         </div>
       </ThemeProvider>

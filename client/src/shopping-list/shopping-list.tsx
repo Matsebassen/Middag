@@ -4,13 +4,15 @@ import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 import { ShopItem } from '../models/shopItem';
 import { ShoppingItem } from './shopping-item';
-import { TextField } from '@mui/material';
+import { Snackbar, TextField } from '@mui/material';
 import { addIngredient, editIngredient } from './shopping-list-service';
 import React, { useState } from 'react';
 
 export const ShoppingList = () => {
-  const [ingredientInput, setIngredientInput] = useState('');
-  const [editingIngredient, setEditingIngredient] = useState(0);
+  const [ ingredientInput, setIngredientInput ] = useState('');
+  const [ editingIngredient, setEditingIngredient ] = useState(0);
+  const [ snackbarOpen, setSnackbarOpen ] = useState(false);
+  const [ snackbarMsg, setSnackbarMsg ] = useState('');
 
   const { data: ingredients, mutate: mutateIngredients } = useSWR(
     'https://middagsapp.azurewebsites.net/API/MiddagsApp/GetShoppingList',
@@ -20,9 +22,13 @@ export const ShoppingList = () => {
 
   const onEditIngredient = async (ingredient: ShopItem) => {
     setEditingIngredient(0);
+    if ( ingredient.haveBought ) {
+      setSnackbarMsg(`${ingredient.name} removed`);
+      setSnackbarOpen(true);
+    }
     const ingredients = await editIngredient(ingredient);
     mutateIngredients(ingredients);
-  }
+  };
 
   const onAddIngredient = async (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter'){
@@ -52,6 +58,13 @@ export const ShoppingList = () => {
                    editingIngredient={editingIngredient}
                    setEditingIngredient={setEditingIngredient}
                    onEditIngredient={onEditIngredient}
+      />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMsg}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </div>
   );
