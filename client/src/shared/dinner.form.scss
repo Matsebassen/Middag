@@ -1,0 +1,29 @@
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .MuiLinearProgress-root {
+    margin-bottom: 8px;
+  }
+}
+
+.add-dinner__form {
+  display: flex;
+  flex-direction: column;
+
+  .MuiTextField-root.dinner-input {
+    margin: 8px 16px;
+  }
+
+  &-ingredients {
+    justify-content: center;
+    margin: 8px 16px;
+    display: flex;
+  }
+
+  .MuiIconButton-root.add-ingredient {
+    align-self: end;
+    margin-right: 16px;
+  }
+}

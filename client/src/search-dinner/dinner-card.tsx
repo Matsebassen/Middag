@@ -13,7 +13,8 @@ import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Button, Tooltip } from '@mui/material';
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
+import { Ingredient } from '../models/ingredient';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -22,32 +23,41 @@ interface ExpandMoreProps extends IconButtonProps {
 const ExpandMore = styled((props: ExpandMoreProps) => {
   const { expand, ...other } = props;
   return <IconButton {...other} />;
-})(({ theme, expand }) => ({
+})(({ theme, expand }) => ( {
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {
     duration: theme.transitions.duration.shortest,
   }),
-}));
+} ));
 
 const openInNewTab = (url: string) => {
   window.open(url, '_blank');
 }
 
-export const DinnerCard = (props: {dinner: Dinner}) => {
-  const [expanded, setExpanded] = React.useState(false);
+export const DinnerCard = (props: {
+  dinner: Dinner,
+  addDinnerToList: (dinner: Dinner) => void,
+  getIngredients: (id: number) => void,
+  openMenu: (event: React.MouseEvent<HTMLButtonElement>, dinner: Dinner) => void
+}) => {
+  const [ expanded, setExpanded ] = React.useState(false);
 
-  const handleExpandClick = () => {
+  const expandDinner = () => {
     setExpanded(!expanded);
+    if ( props.dinner?.id && !props.dinner.ingredients?.length ) {
+      props.getIngredients(props.dinner.id);
+    }
   };
 
   return (
-    <Card className='dinner-card'>
+    <Card className="dinner-card">
       <CardHeader
         className="dinner-card__header"
         action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon color="secondary" />
+          <IconButton aria-label="settings"
+                      onClick={(event) => props.openMenu(event, props.dinner)}>
+            <MoreVertIcon color="secondary"/>
           </IconButton>
         }
         title={props.dinner.name?.toLowerCase()}
@@ -65,7 +75,7 @@ export const DinnerCard = (props: {dinner: Dinner}) => {
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <Button>
+        <Button onClick={() => props.addDinnerToList(props.dinner)}>
           Add to list
         </Button>
         <Button onClick={() => openInNewTab(props.dinner.url)}>
@@ -73,20 +83,57 @@ export const DinnerCard = (props: {dinner: Dinner}) => {
         </Button>
         <ExpandMore
           expand={expanded}
-          onClick={handleExpandClick}
+          onClick={expandDinner}
           aria-expanded={expanded}
           aria-label="show ingredients"
         >
           <Tooltip title="Show ingredients">
-            <ExpandMoreIcon color="secondary" />
+            <ExpandMoreIcon color="secondary"/>
           </Tooltip>
         </ExpandMore>
       </CardActions>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      <Collapse in={expanded}
+                timeout="auto"
+                unmountOnExit>
         <CardContent>
-          Ingredients
+          <IngredientsTable ingredients={props.dinner.ingredients}/>
         </CardContent>
       </Collapse>
     </Card>
   );
 }
+
+const IngredientsTable = (props: { ingredients: Ingredient[] }) => {
+  if ( !props.ingredients?.length ) {
+    return ( <div>Loading ingredients...</div> );
+  }
+  return (
+    <TableContainer component={Paper}
+                    sx={{ boxShadow: 'none' }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell align="right">Qty</TableCell>
+            <TableCell align="right">Unit</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {props.ingredients?.map((ingredient) => (
+            <TableRow
+              key={ingredient.id}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th"
+                         scope="row">
+                {ingredient.name}
+              </TableCell>
+              <TableCell align="right">{ingredient.qty}</TableCell>
+              <TableCell align="right">{ingredient.unit}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
