@@ -5,7 +5,7 @@ import { fetcher } from '../fetcher';
 import { ShopItem } from '../models/shopItem';
 import { ShoppingItem } from './shopping-item';
 import { Snackbar, TextField } from '@mui/material';
-import { addIngredient, editIngredient } from './shopping-list-service';
+import { addIngredient, editIngredient, toggleShopItem } from './shopping-list-service';
 import React, { useState } from 'react';
 
 export const ShoppingList = () => {
@@ -15,27 +15,40 @@ export const ShoppingList = () => {
   const [ snackbarMsg, setSnackbarMsg ] = useState('');
 
   const { data: ingredients, mutate: mutateIngredients } = useSWR(
-    'https://middagsapp.azurewebsites.net/API/MiddagsApp/GetShoppingList',
+    'https://localhost:7267/api/ShopItems',
     fetcher,
     { refreshInterval: 2000 }
   );
 
-  const onEditIngredient = async (ingredient: ShopItem) => {
+  const onEditIngredient = async (shopItem: ShopItem) => {
     setEditingIngredient(0);
-    if ( ingredient.haveBought ) {
-      setSnackbarMsg(`${ingredient.name} removed`);
+    if ( shopItem.recentlyUsed > 0 ) {
+      setSnackbarMsg(`${!shopItem.ingredient.name} removed`);
       setSnackbarOpen(true);
     }
-    const ingredients = await editIngredient(ingredient);
-    mutateIngredients(ingredients);
+    const modifiedShopItem = await editIngredient(shopItem);
+    mutateShopItemAdd(modifiedShopItem);
   };
 
   const onAddIngredient = async (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter'){
-      const ingredients = await addIngredient(ingredientInput);
-      mutateIngredients(ingredients);
+      const shopItem = await addIngredient(ingredientInput);
+      mutateShopItemAdd(shopItem);
       setIngredientInput('');
     }
+  }
+
+  const mutateShopItemAdd = (shopItem: ShopItem) => {
+    const newShopItems: ShopItem[] = [...ingredients];
+    const index = newShopItems.findIndex(item => item.id === shopItem.id);
+    newShopItems[index] = shopItem;
+    mutateIngredients(newShopItems);
+  }
+
+
+  const onToggleHaveBought = async (id: number) => {
+    const shopItem = await toggleShopItem(id);
+    mutateShopItemAdd(shopItem);
   }
 
   return (
@@ -51,6 +64,7 @@ export const ShoppingList = () => {
                    editingIngredient={editingIngredient}
                    setEditingIngredient={setEditingIngredient}
                    onEditIngredient={onEditIngredient}
+                   toggleHaveBought={onToggleHaveBought}
       />
       <h4>Recently used:</h4>
       <GroceryList ingredients={ingredients}
@@ -58,6 +72,7 @@ export const ShoppingList = () => {
                    editingIngredient={editingIngredient}
                    setEditingIngredient={setEditingIngredient}
                    onEditIngredient={onEditIngredient}
+                   toggleHaveBought={onToggleHaveBought}
       />
       <Snackbar
         open={snackbarOpen}
@@ -75,17 +90,19 @@ const GroceryList = (props: {
   haveBought: boolean,
   editingIngredient: number,
   setEditingIngredient: (id: number) => void,
+  toggleHaveBought: (id: number) => void,
   onEditIngredient: (ingredient: ShopItem) => void
 }) => {
   return (
     <div className="shopping-list">
       {props.ingredients && props.ingredients
-        .filter(grocery => grocery.haveBought === props.haveBought)
+        .filter(grocery => (grocery.recentlyUsed > 0) === props.haveBought)
         .map(grocery =>
           <ShoppingItem
-            ingredient={grocery}
+            shopItem={grocery}
             key={grocery.id}
             editIngredient={props.onEditIngredient}
+            toggleHaveBought={props.toggleHaveBought}
             isEditing={ props.editingIngredient === grocery.id}
             setEdit={props.setEditingIngredient}/>
         )}

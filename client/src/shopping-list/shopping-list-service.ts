@@ -1,15 +1,20 @@
 import { ShopItem } from '../models/shopItem';
 import axios from  'axios';
 
-const API = 'https://middagsapp.azurewebsites.net/API/MiddagsApp';
+const API = 'https://localhost:7267/api';
 
-export const editIngredient = (ingredient: ShopItem): Promise<ShopItem[]> => {
-  return axios.post(`${API}/EditShopIngredient`, ingredient)
+export const editIngredient = (shopItem: ShopItem): Promise<ShopItem> => {
+  return axios.put(`${API}/ShopItems/${shopItem.id}`, shopItem)
     .then(res => res.data);
 }
 
-export const addIngredient = (name: string): Promise<ShopItem[]> => {
-  const ingredient: ShopItem = {name, haveBought: false, desc: '', id: 0};
-  return axios.post(`${API}/AddIngredientToShoppingList`, ingredient)
+export const addIngredient = (name: string): Promise<ShopItem> => {
+  const ingredient: ShopItem = {ingredient: {name: name}, recentlyUsed: 0, id: 0};
+  return axios.post(`${API}/ShopItems`, ingredient)
+    .then(res => res.data);
+}
+
+export const toggleShopItem = (id: number): Promise<ShopItem> => {
+  return axios.patch(`${API}/ShopItems/toggle/${id}`)
     .then(res => res.data);
 }

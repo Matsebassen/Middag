@@ -1,6 +1,9 @@
 export type ShopItem = {
-  name: string,
-  haveBought: boolean,
-  id: number,
-  desc: string
+  id: number;
+  description?: string
+  recentlyUsed: number;
+  ingredient: {
+    name: string;
+    id?: number;
+  }
 };

@@ -10,40 +10,38 @@ import { useTheme } from '@mui/material/styles';
 
 
 export const ShoppingItem = (props: {
-  ingredient: ShopItem,
+  shopItem: ShopItem,
   isEditing: boolean,
   editIngredient: (ingredient: ShopItem) => void,
+  toggleHaveBought: (id: number) => void,
   setEdit: (id: number) => void
 }) => {
   const theme = useTheme();
 
   const backgroundColor = {
-    backgroundColor: props.ingredient.haveBought ? theme.palette.primary.light : theme.palette.secondary.light
+    backgroundColor: (props.shopItem.recentlyUsed > 0) ? theme.palette.primary.light : theme.palette.secondary.light
   };
 
   const spanStyle = {
-    fontSize: calculateFontSize(props.ingredient.name)
-  };
-  const toggleHaveBought = (ingredient: ShopItem) => {
-    props.editIngredient({ ...ingredient, haveBought: !ingredient.haveBought });
+    fontSize: calculateFontSize(props.shopItem?.ingredient?.name)
   };
 
   return (
     <Card className="shopping-item"
-          onClick={() => toggleHaveBought(props.ingredient)}>
+          onClick={() => props.toggleHaveBought(props.shopItem.id)}>
       <CardContent
         sx={{ backgroundColor }}
         className="shopping-item__content">
         <div className="shopping-item__heading">
-          {props.ingredient.name?.substring(0, 1)?.toUpperCase()}
+          {props.shopItem.ingredient.name?.substring(0, 1)?.toUpperCase()}
         </div>
         <span style={spanStyle}>
-          {props.ingredient.name}
+          {props.shopItem.ingredient.name}
         </span>
       </CardContent>
       <CardActions onClick={(e) => e.stopPropagation()}>
         <IngredientDescription
-          ingredient={props.ingredient}
+          ingredient={props.shopItem}
           isEditing={props.isEditing}
           editIngredient={props.editIngredient}
           setEdit={props.setEdit}/>
@@ -58,12 +56,12 @@ const IngredientDescription = (props:{
   editIngredient: (ingredient: ShopItem) => void,
   setEdit: (id: number) => void
 }) => {
-  const [ingredientDesc, setIngredientDesc] = useState(props.ingredient.desc);
+  const [ingredientDesc, setIngredientDesc] = useState(props.ingredient.description);
   const theme = useTheme();
 
   function onEditDesc(event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) {
     if (event.key === 'Enter') {
-      props.editIngredient({...props.ingredient, desc: ingredientDesc})
+      props.editIngredient({...props.ingredient, description: ingredientDesc})
     }
   }
 
@@ -75,7 +73,7 @@ const IngredientDescription = (props:{
                onChange={(e) => setIngredientDesc(e.target.value)}
                onKeyDown={(e) => onEditDesc(e)}
                autoFocus={true}/>
-        <IconButton onClick={() => props.editIngredient({...props.ingredient, desc: ingredientDesc})} >
+        <IconButton onClick={() => props.editIngredient({...props.ingredient, description: ingredientDesc})} >
           <CheckIcon/>
         </IconButton>
       </div>
@@ -83,12 +81,12 @@ const IngredientDescription = (props:{
   } else {
     return (
       <div className="shopping-item__actions">
-        <span>{props.ingredient.desc}</span>
+        <span>{props.ingredient.description}</span>
         <IconButton aria-label="Add description"
                     className="shopping-item__desc"
                     sx={{color: theme.palette.primary.light}}
                     onClick={() => props.setEdit(props.ingredient.id)}>
-          {props.ingredient.desc
+          {props.ingredient.description
             ? <ModeEditOutlineOutlinedIcon fontSize="small"/>
             : <AddOutlinedIcon fontSize="small"/>}
         </IconButton>
@@ -99,6 +97,9 @@ const IngredientDescription = (props:{
 
 
 const calculateFontSize = (name: string) => {
+  if (!name){
+    return '12px';
+  }
   const length = name.length;
   let fontSize = '16px';
   if (14 <= length && length <= 17) {
