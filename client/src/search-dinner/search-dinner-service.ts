@@ -1,25 +1,20 @@
 import axios from 'axios';
 import { Dinner } from '../models/dinner';
-import { Ingredient } from '../models/ingredient';
+import { RecipeItem } from '../models/recipeItem';
 
-const API = 'https://middagsapp.azurewebsites.net/API/MiddagsApp';
+const API = 'https://localhost:7267/api';
 
 export const searchDinner = (search: string): Promise<Dinner[]> => {
-  return axios.post(`${API}/SearchDinner`, search, { headers: { 'Content-Type': 'application/json' } })
-    .then(res => res.data);
-};
-
-export const getIngredients = (id: number): Promise<Ingredient[]> => {
-  return axios.post(`${API}/GetIngredients`, id, { headers: { 'Content-Type': 'application/json' } })
+  return axios.get(`${API}/DinnerItems/search/${search}`)
     .then(res => res.data);
 };
 
 export const editDinner = (dinner: Dinner): Promise<string> => {
-  return axios.post(`${API}/EditDinner`, dinner)
+  return axios.put(`${API}/DinnerItems/${dinner.id}`, dinner)
     .then(res => res.data);
 };
 
-export const addDinnerToShoppingList = (dinner: Dinner): Promise<string> => {
-  return axios.post(`${API}/addDinnerToShopList`, dinner)
+export const addDinnerToShoppingList = (id: number): Promise<string> => {
+  return axios.post(`${API}/addDinnerToShopList/${id}`)
     .then(res => res.data);
 };

@@ -24,13 +24,11 @@ export const EditDinnerDialog = (props: {
             onClose={props.handleClose}>
       <DialogTitle>Edit dinner</DialogTitle>
       <DialogContent>
-        <DialogContentText>
           <div>
             <DinnerForm
               dinner={props.dinner}
               formikRef={formikRef}/>
           </div>
-        </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={props.handleClose}>Cancel</Button>

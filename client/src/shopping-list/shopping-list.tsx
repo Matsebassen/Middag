@@ -97,6 +97,7 @@ const GroceryList = (props: {
     <div className="shopping-list">
       {props.ingredients && props.ingredients
         .filter(grocery => (grocery.recentlyUsed > 0) === props.haveBought)
+        .sort((a, b) => props.haveBought ? b.recentlyUsed - a.recentlyUsed : b.id - a.id)
         .map(grocery =>
           <ShoppingItem
             shopItem={grocery}

@@ -1,4 +1,4 @@
-import { Ingredient } from './ingredient';
+import { RecipeItem } from './recipeItem';
 
 export type Dinner = {
   id?: number,
@@ -7,5 +7,5 @@ export type Dinner = {
   portions: string,
   tags: string,
   url: string,
-  ingredients: Ingredient[]
+  ingredients: RecipeItem[]
 }

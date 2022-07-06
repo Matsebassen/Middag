@@ -1,12 +1,11 @@
 import './search-dinner.scss';
 import React, { useState } from 'react';
-import { addDinnerToShoppingList, editDinner, getIngredients, searchDinner } from './search-dinner-service';
+import { addDinnerToShoppingList, editDinner, searchDinner } from './search-dinner-service';
 import { Dinner } from '../models/dinner';
 import { DinnerCard } from './dinner-card';
 
 import { Menu, MenuItem, TextField } from '@mui/material';
 import EditDinnerDialog from './edit-dinner-dialog';
-import { Ingredient } from '../models/ingredient';
 
 export const SearchDinner = () => {
   const [ searchInput, setSearchInput ] = useState('');
@@ -14,7 +13,6 @@ export const SearchDinner = () => {
   const [ dialogOpen, setDialogOpen ] = useState(false);
   const [ anchorEl, setAnchorEl ] = useState<null | HTMLElement>(null);
   const [ currentDinner, setCurrentDinner ] = useState<null | Dinner>(null);
-  const [ ingredients, setIngredients ] = useState<{ [ id: string ]: Ingredient[] }>({});
 
   const open = Boolean(anchorEl);
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, dinner: Dinner) => {
@@ -34,15 +32,9 @@ export const SearchDinner = () => {
 
   const openDinnerDialog = async () => {
     if ( currentDinner?.id ) {
-      getDinnerIngredients(currentDinner.id);
       handleMenuClose();
       setDialogOpen(true);
     }
-  };
-
-  const getDinnerIngredients = async (id: number) => {
-    const dinnerIngredients = await getIngredients(id);
-    setIngredients({ ...ingredients, [ id ]: dinnerIngredients });
   };
 
   const saveDinner = async (dinner: Dinner) => {
@@ -63,8 +55,7 @@ export const SearchDinner = () => {
   const addDinnerToList = async (dinner: Dinner) => {
     if ( dinner?.id ) {
       try {
-        await getDinnerIngredients(dinner.id);
-        const result = await addDinnerToShoppingList({ ...dinner, ingredients: ingredients[ dinner.id ] });
+        const result = await addDinnerToShoppingList(dinner.id);
         console.log(result);
       } catch ( e ) {
 
@@ -85,10 +76,9 @@ export const SearchDinner = () => {
       <div className="dinner-list">
         {dinners?.map((dinner: Dinner) => (
           <DinnerCard
-            dinner={{ ...dinner, ingredients: ingredients[ dinner.id || 0 ] }}
+            dinner={dinner}
             key={dinner.id}
             addDinnerToList={addDinnerToList}
-            getIngredients={getDinnerIngredients}
             openMenu={handleMenuClick}
           />
         ))}
@@ -96,7 +86,7 @@ export const SearchDinner = () => {
       {currentDinner &&
       <EditDinnerDialog
           open={dialogOpen}
-          dinner={( { ...currentDinner, ingredients: ingredients[ currentDinner?.id || 0 ] } )}
+          dinner={currentDinner}
           handleSave={(dinner: Dinner) => saveDinner(dinner)}
           handleClose={() => setDialogOpen(false)}/>
       }

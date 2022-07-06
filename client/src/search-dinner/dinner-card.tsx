@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
-import { Ingredient } from '../models/ingredient';
+import { RecipeItem } from '../models/recipeItem';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -38,16 +38,12 @@ const openInNewTab = (url: string) => {
 export const DinnerCard = (props: {
   dinner: Dinner,
   addDinnerToList: (dinner: Dinner) => void,
-  getIngredients: (id: number) => void,
   openMenu: (event: React.MouseEvent<HTMLButtonElement>, dinner: Dinner) => void
 }) => {
   const [ expanded, setExpanded ] = React.useState(false);
 
   const expandDinner = () => {
     setExpanded(!expanded);
-    if ( props.dinner?.id && !props.dinner.ingredients?.length ) {
-      props.getIngredients(props.dinner.id);
-    }
   };
 
   return (
@@ -103,7 +99,7 @@ export const DinnerCard = (props: {
   );
 }
 
-const IngredientsTable = (props: { ingredients: Ingredient[] }) => {
+const IngredientsTable = (props: { ingredients: RecipeItem[] }) => {
   if ( !props.ingredients?.length ) {
     return ( <div>Loading ingredients...</div> );
   }
@@ -119,17 +115,17 @@ const IngredientsTable = (props: { ingredients: Ingredient[] }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.ingredients?.map((ingredient) => (
+          {props.ingredients?.map((recipeItem) => (
             <TableRow
-              key={ingredient.id}
+              key={recipeItem.id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th"
                          scope="row">
-                {ingredient.name}
+                {recipeItem.ingredient.name}
               </TableCell>
-              <TableCell align="right">{ingredient.qty}</TableCell>
-              <TableCell align="right">{ingredient.unit}</TableCell>
+              <TableCell align="right">{recipeItem.qty}</TableCell>
+              <TableCell align="right">{recipeItem.unit}</TableCell>
             </TableRow>
           ))}
         </TableBody>

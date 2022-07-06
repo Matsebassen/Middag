@@ -1,5 +1,5 @@
 import { Dinner } from '../models/dinner';
-import { Ingredient } from '../models/ingredient';
+import { RecipeItem } from '../models/recipeItem';
 import './dinner.form.scss';
 
 import * as React from 'react';
@@ -25,7 +25,7 @@ export const DinnerForm = (props: {
         portions: dinner?.portions || '',
         tags: dinner?.tags || '',
         url: dinner?.url || '',
-        ingredients: dinner?.ingredients || ( [ { name: '', qty: '', unit: '' } ] as Ingredient[] )
+        ingredients: dinner?.ingredients || ( [ { qty: '', unit: '', ingredient: {name: ''} } ] as RecipeItem[] )
       }}
               innerRef={props.formikRef}
               onSubmit={() => console.log('submit')}>
@@ -67,7 +67,7 @@ const DinnerFormikForm = () => {
                 <div key={index}
                      className="add-dinner__form-ingredients">
                   <Field
-                    name={`ingredients[${index}].name`}
+                    name={`ingredients[${index}].ingredient.name`}
                     component={FormikTextField}
                     InputLabelProps={{ shrink: true }}
                     style={{ flex: '2 2 auto', marginRight: '8px' }}

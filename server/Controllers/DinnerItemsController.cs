@@ -52,9 +52,9 @@ namespace MiddagApi.Controllers
             return dinnerItem;
         }
 
-        // GET: api/DinnerItems/potet
+        // GET: api/DinnerItems/search/potet
         [HttpGet("search/{search}")]
-        public async Task<ActionResult<IEnumerable<DinnerItem>>> GetDinnerItems(string searchString)
+        public async Task<ActionResult<IEnumerable<DinnerItem>>> GetDinnerItems(string search)
         {
           if (_context.DinnerItems == null)
           {
@@ -65,8 +65,8 @@ namespace MiddagApi.Controllers
                               .ThenInclude(i => i.Ingredient)
                               select dinnerItem;
 
-            if (!String.IsNullOrEmpty(searchString)){
-              dinners = dinners.Where(d => d.Name.Contains(searchString));
+            if (!String.IsNullOrEmpty(search)){
+              dinners = dinners.Where(d => d.Name.Contains(search));
             }        
 
             return await dinners.AsNoTracking().ToListAsync();
@@ -80,9 +80,53 @@ namespace MiddagApi.Controllers
             if (id != dinnerItem.ID)
             {
                 return BadRequest();
-            }
-
+            }            
             _context.Entry(dinnerItem).State = EntityState.Modified;
+    
+            // Save any changes to ingredients
+            if (dinnerItem.Ingredients != null){
+              
+              var dinnerInDb = await _context.DinnerItems
+                .AsNoTracking()
+                .Include(d => d.Ingredients)
+                .FirstOrDefaultAsync(d => d.ID == dinnerItem.ID);
+
+              if (dinnerInDb != null && dinnerInDb.Ingredients != null){
+                // Delete any recipeItems that are removed from dinner
+                var deletedRecipeItems = dinnerInDb.Ingredients
+                  .Where(i => dinnerItem.Ingredients.FindIndex(ri => ri.ID == i.ID) > -1 ? false : true)
+                  .ToList();
+                
+                deletedRecipeItems.ForEach(deletedItem => {
+                  _context.Entry(deletedItem).State = EntityState.Deleted;
+                });                
+              }
+
+              //Check whether recipeItems are new or modified
+              dinnerItem.Ingredients.ForEach(recipeItem => {
+                if (recipeItem.Ingredient != null && recipeItem.Ingredient.Name != null){     
+                  if (recipeItem.ID != 0){
+                    // Existing recipeItem. Check if ingredient has changed
+                    _context.Entry(recipeItem).State = EntityState.Modified;
+                    var recipeItemInDb = _context.RecipeItem
+                      .Where(r => r.ID == recipeItem.ID)
+                      .Include(r => r.Ingredient)
+                      .AsNoTracking()
+                      .FirstOrDefault();
+
+                    if (recipeItemInDb == null
+                    || recipeItemInDb.Ingredient == null 
+                    || recipeItemInDb.Ingredient.Name != recipeItem.Ingredient.Name){
+                      recipeItem.Ingredient = GetIngredientItem(recipeItem.Ingredient.Name);
+                    }
+                  } else {
+                    // New recipeItem
+                    recipeItem.Ingredient = GetIngredientItem(recipeItem.Ingredient.Name);
+                    _context.Entry(recipeItem).State = EntityState.Added;
+                  }
+                }             
+              }); 
+            }       
 
             try
             {
@@ -98,9 +142,26 @@ namespace MiddagApi.Controllers
                 {
                     throw;
                 }
-            }
+            }            
 
-            return NoContent();
+            return Ok(dinnerItem);
+        }
+
+        private IngredientItem GetIngredientItem(string name) {
+          var ingredient = _context.IngredientItem
+            .Where(i => i.Name == name)
+            .AsNoTracking()
+            .FirstOrDefault();
+          if (ingredient != null){
+            // Update to existing ingredient
+            return ingredient;
+          } else {
+            // Create a new ingredient
+            var newIngredient = new IngredientItem();
+            newIngredient.ID = 0;
+            newIngredient.Name = name;
+            return newIngredient;
+          }
         }
 
         // POST: api/DinnerItems
@@ -114,7 +175,7 @@ namespace MiddagApi.Controllers
           }    
           
           if (dinnerItem.Ingredients != null) {
-            for(int i = 0; i<dinnerItem.Ingredients.Capacity; i++) {
+            for(int i = 0; i<dinnerItem.Ingredients.Count; i++) {
               var ingredient = dinnerItem.Ingredients[i];
               if (ingredient.Ingredient != null) {
                   var ingredientName = ingredient.Ingredient.Name;
