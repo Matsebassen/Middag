@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Dinner } from '../models/dinner';
 import { DinnerForm } from '../shared/dinner-form';
 import { useRef } from 'react';

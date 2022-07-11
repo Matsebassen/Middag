@@ -134,13 +134,21 @@ namespace MiddagApi.Controllers
               return Problem("Ingredient name is empty");
           }
           var shopItemName = shopItem.Ingredient.Name;
-          var existingShopItem = await _context.ShopItems
+          shopItem = await AddIngredientToList(shopItemName);
+
+          await _context.SaveChangesAsync();
+
+          return CreatedAtAction("GetShopItem", new { id = shopItem.ID }, shopItem);
+        }
+
+        private async Task<ShopItem> AddIngredientToList(string shopItemName){
+            var existingShopItem = await _context.ShopItems
             .Include(s => s.Ingredient)
             .SingleOrDefaultAsync(si => si.Ingredient.Name.Equals(shopItemName));
             if (existingShopItem != null) {
               // Already exists in shopping list
               if (existingShopItem.RecentlyUsed > 0) {
-                // It's in recenty used section only. So revert to the "to buy" list and reset desc
+                // It's in recently used section only. So revert to the "to buy" list and reset desc
                 existingShopItem.RecentlyUsed = 0;
                 existingShopItem.Description = "";              
               } else {
@@ -149,23 +157,52 @@ namespace MiddagApi.Controllers
                   existingShopItem.Description += " +";
                 }
               }
-              shopItem = existingShopItem;
-              //_context.ShopItems.Update
+              return existingShopItem;              
             } else {
               // new ingredient to shopping list
+              var shopItem = new ShopItem();
               var ingredientItem = await _context.IngredientItem
                 .FirstOrDefaultAsync(i => i.Name == shopItemName);
               if (ingredientItem != null) {
                 shopItem.Ingredient = ingredientItem;
               }
+              shopItem.Ingredient = new IngredientItem();
+              shopItem.Ingredient.Name = shopItemName;
               shopItem.RecentlyUsed = 0;
               shopItem.Description = "";
               _context.ShopItems.Add(shopItem);
+              return shopItem;
             }          
-          await _context.SaveChangesAsync();
-
-          return CreatedAtAction("GetShopItem", new { id = shopItem.ID }, shopItem);
         }
+
+         // POST: api/ShopItems/addDinner/5
+        [HttpPost("addDinner/{id}")]
+        public async Task<IActionResult> AddDinnerToList(long id)
+        {
+            if (_context.ShopItems == null)
+            {
+                return NotFound();
+            }
+            var dinnerItem = await _context.DinnerItems
+              .AsNoTracking()
+              .Include(d => d.Ingredients)
+              .ThenInclude(ri => ri.Ingredient)
+              .FirstOrDefaultAsync(d => d.ID == id);
+              
+            if (dinnerItem == null || dinnerItem.Ingredients == null)
+            {
+                return NotFound();
+            }
+            foreach(var recipeItem in dinnerItem.Ingredients){
+              if (recipeItem.Ingredient != null && recipeItem.Ingredient.Name != null){
+                await AddIngredientToList(recipeItem.Ingredient.Name);
+              }              
+            }           
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }  
 
         // DELETE: api/ShopItems/5
         [HttpDelete("{id}")]

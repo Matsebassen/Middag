@@ -190,7 +190,7 @@ namespace MiddagApi.Controllers
           await _context.SaveChangesAsync();
 
           return CreatedAtAction(nameof(GetDinnerItem), new { id = dinnerItem.ID }, dinnerItem);
-        }
+        }    
 
         // DELETE: api/DinnerItems/5
         [HttpDelete("{id}")]

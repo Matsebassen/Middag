@@ -40,12 +40,11 @@ export const SearchDinner = () => {
   const saveDinner = async (dinner: Dinner) => {
     try {
       setDialogOpen(false);
-      const result = await editDinner(dinner);
-      console.log(result);
+      const result: Dinner = await editDinner(dinner);
       const index = dinners.findIndex(d => d.id === dinner.id);
       const updatedDinners = [ ...dinners ];
       dinners.slice();
-      updatedDinners[ index ] = dinner;
+      updatedDinners[ index ] = result;
       setDinners(updatedDinners);
     } catch ( e ) {
 

@@ -33,10 +33,10 @@ export const ShoppingItem = (props: {
         sx={{ backgroundColor }}
         className="shopping-item__content">
         <div className="shopping-item__heading">
-          {props.shopItem.ingredient.name?.substring(0, 1)?.toUpperCase()}
+          {props.shopItem.ingredient?.name?.substring(0, 1)?.toUpperCase()}
         </div>
         <span style={spanStyle}>
-          {props.shopItem.ingredient.name}
+          {props.shopItem.ingredient?.name}
         </span>
       </CardContent>
       <CardActions onClick={(e) => e.stopPropagation()}>
