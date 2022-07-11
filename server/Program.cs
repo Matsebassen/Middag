@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<DinnerContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("Middagdb")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
