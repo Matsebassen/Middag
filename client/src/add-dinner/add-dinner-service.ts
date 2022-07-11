@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { Dinner } from '../models/dinner';
-
-const API = 'https://localhost:7267/api';
+import { API } from '../api';
 
 export const addDinner = (dinner: Dinner): Promise<Dinner> => {
   return axios.post(`${API}/DinnerItems`, dinner)
