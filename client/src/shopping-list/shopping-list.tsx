@@ -7,6 +7,7 @@ import { ShoppingItem } from './shopping-item';
 import { Snackbar, TextField } from '@mui/material';
 import { addIngredient, editIngredient, toggleShopItem } from './shopping-list-service';
 import React, { useState } from 'react';
+import { API } from '../api';
 
 export const ShoppingList = () => {
   const [ ingredientInput, setIngredientInput ] = useState('');
@@ -15,7 +16,7 @@ export const ShoppingList = () => {
   const [ snackbarMsg, setSnackbarMsg ] = useState('');
 
   const { data: ingredients, mutate: mutateIngredients } = useSWR(
-    'https://localhost:7267/api/ShopItems',
+    `${API}/ShopItems`,
     fetcher,
     { refreshInterval: 2000 }
   );
