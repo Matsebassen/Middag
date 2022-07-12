@@ -4,7 +4,7 @@ import { addDinnerToShoppingList, editDinner, searchDinner } from './search-dinn
 import { Dinner } from '../models/dinner';
 import { DinnerCard } from './dinner-card';
 
-import { Menu, MenuItem, TextField } from '@mui/material';
+import { LinearProgress, Menu, MenuItem, TextField } from '@mui/material';
 import EditDinnerDialog from './edit-dinner-dialog';
 
 export const SearchDinner = () => {
@@ -13,6 +13,7 @@ export const SearchDinner = () => {
   const [ dialogOpen, setDialogOpen ] = useState(false);
   const [ anchorEl, setAnchorEl ] = useState<null | HTMLElement>(null);
   const [ currentDinner, setCurrentDinner ] = useState<null | Dinner>(null);
+  const [ loading, setLoading ] = useState<boolean>(false);
 
   const open = Boolean(anchorEl);
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, dinner: Dinner) => {
@@ -25,8 +26,10 @@ export const SearchDinner = () => {
 
   const onDinnerSearch = async (e: React.KeyboardEvent<HTMLDivElement>) => {
     if ( e.key === 'Enter' ) {
+      setLoading(true);
       const dinners = await searchDinner(searchInput);
       setDinners(dinners);
+      setLoading(false);
     }
   };
 
@@ -39,6 +42,7 @@ export const SearchDinner = () => {
 
   const saveDinner = async (dinner: Dinner) => {
     try {
+      setLoading(true);
       setDialogOpen(false);
       const result: Dinner = await editDinner(dinner);
       const index = dinners.findIndex(d => d.id === dinner.id);
@@ -48,18 +52,21 @@ export const SearchDinner = () => {
       setDinners(updatedDinners);
     } catch ( e ) {
 
+    } finally {
+      setLoading(false);
     }
   };
 
   const addDinnerToList = async (dinner: Dinner) => {
     if ( dinner?.id ) {
       try {
+        setLoading(true);
         const result = await addDinnerToShoppingList(dinner.id);
         console.log(result);
       } catch ( e ) {
 
       } finally {
-
+        setLoading(false);
       }
     }
   };
@@ -72,6 +79,7 @@ export const SearchDinner = () => {
                  onChange={(e) => setSearchInput(e?.target?.value)}
                  onKeyDown={(e) => onDinnerSearch(e)}
                  variant="outlined"/>
+      {loading && <LinearProgress></LinearProgress>}
       <div className="dinner-list">
         {dinners?.map((dinner: Dinner) => (
           <DinnerCard
