@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 import { ShopItem } from '../models/shopItem';
 import { ShoppingItem } from './shopping-item';
-import { Snackbar, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import { addIngredient, editIngredient, toggleShopItem } from './shopping-list-service';
 import React, { useState } from 'react';
 import { API } from '../api';
@@ -12,8 +12,6 @@ import { API } from '../api';
 export const ShoppingList = () => {
   const [ ingredientInput, setIngredientInput ] = useState('');
   const [ editingIngredient, setEditingIngredient ] = useState(0);
-  const [ snackbarOpen, setSnackbarOpen ] = useState(false);
-  const [ snackbarMsg, setSnackbarMsg ] = useState('');
 
   const { data: ingredients, mutate: mutateIngredients } = useSWR(
     `${API}/ShopItems`,
@@ -23,10 +21,6 @@ export const ShoppingList = () => {
 
   const onEditIngredient = async (shopItem: ShopItem) => {
     setEditingIngredient(0);
-    if ( shopItem.recentlyUsed > 0 ) {
-      setSnackbarMsg(`${!shopItem.ingredient.name} removed`);
-      setSnackbarOpen(true);
-    }
     const modifiedShopItem = await editIngredient(shopItem);
     mutateShopItemAdd(modifiedShopItem);
   };
@@ -74,13 +68,6 @@ export const ShoppingList = () => {
                    setEditingIngredient={setEditingIngredient}
                    onEditIngredient={onEditIngredient}
                    toggleHaveBought={onToggleHaveBought}
-      />
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={1500}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMsg}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </div>
   );

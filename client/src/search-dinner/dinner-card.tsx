@@ -56,7 +56,7 @@ export const DinnerCard = (props: {
             <MoreVertIcon color="secondary"/>
           </IconButton>
         }
-        title={props.dinner.name?.toLowerCase()}
+        title={props.dinner.name?.substring(0, 1).toUpperCase() + props.dinner.name?.substring(1).toLowerCase()}
         subheader={props.dinner.tags}
       />
       <CardMedia

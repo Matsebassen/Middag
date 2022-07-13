@@ -201,7 +201,7 @@ namespace MiddagApi.Controllers
 
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(dinnerItem.Name + " - added!");
         }  
 
         // DELETE: api/ShopItems/5

@@ -4,7 +4,7 @@ import { addDinnerToShoppingList, editDinner, searchDinner } from './search-dinn
 import { Dinner } from '../models/dinner';
 import { DinnerCard } from './dinner-card';
 
-import { LinearProgress, Menu, MenuItem, TextField } from '@mui/material';
+import { LinearProgress, Menu, MenuItem, Snackbar, TextField } from '@mui/material';
 import EditDinnerDialog from './edit-dinner-dialog';
 
 export const SearchDinner = () => {
@@ -14,6 +14,8 @@ export const SearchDinner = () => {
   const [ anchorEl, setAnchorEl ] = useState<null | HTMLElement>(null);
   const [ currentDinner, setCurrentDinner ] = useState<null | Dinner>(null);
   const [ loading, setLoading ] = useState<boolean>(false);
+  const [ snackbarOpen, setSnackbarOpen ] = useState(false);
+  const [ snackbarMsg, setSnackbarMsg ] = useState('');
 
   const open = Boolean(anchorEl);
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, dinner: Dinner) => {
@@ -62,7 +64,8 @@ export const SearchDinner = () => {
       try {
         setLoading(true);
         const result = await addDinnerToShoppingList(dinner.id);
-        console.log(result);
+        setSnackbarMsg(result);
+        setSnackbarOpen(true);
       } catch ( e ) {
 
       } finally {
@@ -108,6 +111,13 @@ export const SearchDinner = () => {
       >
         <MenuItem onClick={openDinnerDialog}>Edit</MenuItem>
       </Menu>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMsg}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </div>
   )
 }
