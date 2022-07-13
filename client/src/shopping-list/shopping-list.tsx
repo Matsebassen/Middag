@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 import { ShopItem } from '../models/shopItem';
 import { ShoppingItem } from './shopping-item';
-import { TextField } from '@mui/material';
+import { LinearProgress, TextField } from '@mui/material';
 import { addIngredient, editIngredient, toggleShopItem } from './shopping-list-service';
 import React, { useState } from 'react';
 import { API } from '../api';
@@ -12,6 +12,8 @@ import { API } from '../api';
 export const ShoppingList = () => {
   const [ ingredientInput, setIngredientInput ] = useState('');
   const [ editingIngredient, setEditingIngredient ] = useState(0);
+  const [ loading, setLoading ] = useState(false);
+
 
   const { data: ingredients, mutate: mutateIngredients } = useSWR(
     `${API}/ShopItems`,
@@ -20,16 +22,20 @@ export const ShoppingList = () => {
   );
 
   const onEditIngredient = async (shopItem: ShopItem) => {
+    setLoading(true);
     setEditingIngredient(0);
     const modifiedShopItem = await editIngredient(shopItem);
     mutateShopItemAdd(modifiedShopItem);
+    setLoading(false);
   };
 
   const onAddIngredient = async (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter'){
+      setLoading(true);
       const shopItem = await addIngredient(ingredientInput);
       mutateShopItemAdd(shopItem);
       setIngredientInput('');
+      setLoading(false);
     }
   }
 
@@ -42,8 +48,10 @@ export const ShoppingList = () => {
 
 
   const onToggleHaveBought = async (id: number) => {
+    setLoading(true);
     const shopItem = await toggleShopItem(id);
     mutateShopItemAdd(shopItem);
+    setLoading(false);
   }
 
   return (
@@ -54,6 +62,7 @@ export const ShoppingList = () => {
                  onChange={(e) => setIngredientInput(e?.target?.value)}
                  onKeyDown={(e) => onAddIngredient(e)}
                  variant="outlined"/>
+      {loading && <LinearProgress></LinearProgress>}
       <GroceryList ingredients={ingredients}
                    haveBought={false}
                    editingIngredient={editingIngredient}

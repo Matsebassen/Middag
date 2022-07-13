@@ -102,10 +102,12 @@ const calculateFontSize = (name: string) => {
   }
   const length = name.length;
   let fontSize = '16px';
-  if (14 <= length && length <= 17) {
-  fontSize = '14px';
-  } else if (length > 17 ) {
-  fontSize = '12px';
+  if ( 14 <= length && length <= 17 ) {
+    fontSize = '14px';
+  } else if ( 17 < length && length <= 21 ) {
+    fontSize = '12px';
+  } else if ( 21 < length ) {
+    fontSize = '10px';
   }
   return fontSize;
 }
