@@ -47,7 +47,8 @@ export const DinnerCard = (props: {
   };
 
   return (
-    <Card className="dinner-card">
+    <Card className="dinner-card"
+          sx={{ maxHeight: expanded ? '100%' : '400px' }}>
       <CardHeader
         className="dinner-card__header"
         action={
@@ -61,7 +62,7 @@ export const DinnerCard = (props: {
       />
       <CardMedia
         component="img"
-        height="160"
+        height="220"
         image={props.dinner.picUrl}
         alt={props.dinner.name}
       />

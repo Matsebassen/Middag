@@ -1,15 +1,22 @@
 .dinner-card{
-  width: 345px;
-  margin: 8px;
-  .MuiCardHeader-root{
+  width: 260px;
+  margin: 16px 8px;
+
+  .MuiCardHeader-root {
     height: 80px;
+    padding-bottom: 0;
   }
 
-  &__header{
-    .MuiCardHeader-title{
+  .MuiCardContent-root {
+    padding: 4px;
+  }
+
+  &__header {
+    .MuiCardHeader-title {
       font-size: 1.2rem;
     }
-    .MuiCardHeader-subheader{
+
+    .MuiCardHeader-subheader {
       font-size: 0.8rem;
     }
   }
