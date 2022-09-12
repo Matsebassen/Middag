@@ -1,3 +1,12 @@
+.search-dinner{
+  display: flex;
+  justify-content: center;
+  Button{
+    height: 40px;
+    align-self: center;
+  }
+}
+
 .dinner-list{
   display: flex;
   flex-wrap: wrap;

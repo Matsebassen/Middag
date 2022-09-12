@@ -4,7 +4,7 @@ import { addDinnerToShoppingList, editDinner, searchDinner } from './search-dinn
 import { Dinner } from '../models/dinner';
 import { DinnerCard } from './dinner-card';
 
-import { LinearProgress, Menu, MenuItem, Snackbar, TextField } from '@mui/material';
+import {Button, LinearProgress, Menu, MenuItem, Snackbar, TextField} from '@mui/material';
 import EditDinnerDialog from './edit-dinner-dialog';
 
 export const SearchDinner = () => {
@@ -26,13 +26,18 @@ export const SearchDinner = () => {
     setAnchorEl(null);
   };
 
-  const onDinnerSearch = async (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const onInputKeyDown = async (e: React.KeyboardEvent<HTMLDivElement>) => {
     if ( e.key === 'Enter' ) {
+      await dinnerSearch();
+    }
+  }
+
+
+    const dinnerSearch = async () => {
       setLoading(true);
       const dinners = await searchDinner(searchInput);
       setDinners(dinners);
       setLoading(false);
-    }
   };
 
   const openDinnerDialog = async () => {
@@ -76,12 +81,15 @@ export const SearchDinner = () => {
 
   return (
     <div>
-      <TextField className="ingredient-input"
-                 label="Search"
-                 value={searchInput}
-                 onChange={(e) => setSearchInput(e?.target?.value)}
-                 onKeyDown={(e) => onDinnerSearch(e)}
-                 variant="outlined"/>
+      <div className="search-dinner">
+        <TextField className="ingredient-input"
+                   label="Search"
+                   value={searchInput}
+                   onChange={(e) => setSearchInput(e?.target?.value)}
+                   onKeyDown={onInputKeyDown}
+                   variant="outlined"/>
+        <Button onClick={dinnerSearch}>Search</Button>
+      </div>
       {loading && <LinearProgress></LinearProgress>}
       <div className="dinner-list">
         {dinners?.map((dinner: Dinner) => (
