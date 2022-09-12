@@ -152,10 +152,8 @@ namespace MiddagApi.Controllers
                 existingShopItem.RecentlyUsed = 0;
                 existingShopItem.Description = "";              
               } else {
-                // Add a + to the description if it already had a desc, if not, do nothing.
-                if (!String.IsNullOrEmpty(existingShopItem.Description)){
+                // Add a + to the description if it already exists
                   existingShopItem.Description += " +";
-                }
               }
               return existingShopItem;              
             } else {
