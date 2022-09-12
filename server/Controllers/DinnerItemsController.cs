@@ -72,6 +72,22 @@ namespace MiddagApi.Controllers
             return await dinners.AsNoTracking().ToListAsync();
         }
 
+         // GET: api/DinnerItems/search
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<DinnerItem>>> GetAllDinnerItems()
+        {
+          if (_context.DinnerItems == null)
+          {
+              return NotFound();
+          }
+            var dinners = from dinnerItem in _context.DinnerItems
+                              .Include(d => d.Ingredients)
+                              .ThenInclude(i => i.Ingredient)
+                              select dinnerItem;
+
+            return await dinners.AsNoTracking().ToListAsync();
+        }
+
         // PUT: api/DinnerItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
