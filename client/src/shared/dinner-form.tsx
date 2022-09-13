@@ -8,6 +8,9 @@ import { IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { TextField as FormikTextField } from 'formik-mui';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import {useState} from "react";
+import AddIngredientsDialog from "./add-ingredients-dialog/add-ingredients-dialog";
 
 export const DinnerForm = (props: {
                              dinner: Dinner | null,
@@ -25,7 +28,7 @@ export const DinnerForm = (props: {
         portions: dinner?.portions || '',
         tags: dinner?.tags || '',
         url: dinner?.url || '',
-        ingredients: dinner?.ingredients || ( [ { qty: '', unit: '', ingredient: {name: ''} } ] as RecipeItem[] )
+        ingredients: dinner?.ingredients || ( [] as RecipeItem[] )
       }}
               innerRef={props.formikRef}
               onSubmit={() => console.log('submit')}>
@@ -36,7 +39,13 @@ export const DinnerForm = (props: {
 };
 
 const DinnerFormikForm = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const { values, handleSubmit, handleChange } = useFormikContext<Dinner>();
+
+  const addRecipeItems = (items: RecipeItem[] | null) => {
+
+  }
+
   return (
     <Form onSubmit={handleSubmit}
           autoComplete="off">
@@ -62,6 +71,20 @@ const DinnerFormikForm = () => {
         <FieldArray name="ingredients">
           {({ remove, push }) => (
             <React.Fragment>
+              <Tooltip title="Add ingredients as list">
+                <IconButton color="primary"
+                            className="add-ingredient"
+                            onClick={() => setDialogOpen(true)}>
+                  <PostAddIcon/>                                                  
+                </IconButton>
+              </Tooltip>
+              <AddIngredientsDialog
+                open={dialogOpen}
+                onClose={(items) => {
+                  items?.forEach(item => push(item));
+                  setDialogOpen(false);
+                }}
+              />
               {values?.ingredients?.length > 0 &&
               values?.ingredients.map((ingredient, index) => (
                 <div key={index}
