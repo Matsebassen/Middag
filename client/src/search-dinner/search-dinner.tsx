@@ -82,7 +82,7 @@ export const SearchDinner = () => {
   return (
     <div>
       <div className="search-dinner">
-        <TextField className="ingredient-input"
+        <TextField className="search-input"
                    label="Search"
                    value={searchInput}
                    onChange={(e) => setSearchInput(e?.target?.value)}

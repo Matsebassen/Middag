@@ -1,6 +1,9 @@
 .search-dinner{
   display: flex;
   justify-content: center;
+  .search-input{
+    margin: 32px 16px 32px 0;
+  }
   Button{
     height: 40px;
     align-self: center;
