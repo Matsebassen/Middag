@@ -1,4 +1,4 @@
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Input, TextField} from "@mui/material";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@mui/material";
 import {SimpleDialogProps} from "../../models/dialog";
 import {useState} from "react";
 import {RecipeItem} from "../../models/recipeItem";

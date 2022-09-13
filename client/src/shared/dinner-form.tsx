@@ -41,11 +41,7 @@ export const DinnerForm = (props: {
 const DinnerFormikForm = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { values, handleSubmit, handleChange } = useFormikContext<Dinner>();
-
-  const addRecipeItems = (items: RecipeItem[] | null) => {
-
-  }
-
+  
   return (
     <Form onSubmit={handleSubmit}
           autoComplete="off">
