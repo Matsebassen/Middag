@@ -1,5 +1,6 @@
 import './search-dinner.scss';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import { addDinnerToShoppingList, editDinner, searchDinner } from './search-dinner-service';
 import { Dinner } from '../models/dinner';
 import { DinnerCard } from './dinner-card';
@@ -9,13 +10,16 @@ import EditDinnerDialog from './edit-dinner-dialog';
 
 export const SearchDinner = () => {
   const [ searchInput, setSearchInput ] = useState('');
-  const [ dinners, setDinners ] = useState([] as Dinner[]);
   const [ dialogOpen, setDialogOpen ] = useState(false);
   const [ anchorEl, setAnchorEl ] = useState<null | HTMLElement>(null);
   const [ currentDinner, setCurrentDinner ] = useState<null | Dinner>(null);
+  // eslint-disable-next-line
   const [ loading, setLoading ] = useState<boolean>(false);
   const [ snackbarOpen, setSnackbarOpen ] = useState(false);
   const [ snackbarMsg, setSnackbarMsg ] = useState('');
+
+  const queryClient = useQueryClient()
+  const {data: dinners, isFetching, ...dinnersQuery} = useQuery(['dinners', searchInput], () => searchDinner(searchInput), {enabled: false})
 
   const open = Boolean(anchorEl);
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, dinner: Dinner) => {
@@ -34,10 +38,7 @@ export const SearchDinner = () => {
 
 
     const dinnerSearch = async () => {
-      setLoading(true);
-      const dinners = await searchDinner(searchInput);
-      setDinners(dinners);
-      setLoading(false);
+      await dinnersQuery.refetch();
   };
 
   const openDinnerDialog = async () => {
@@ -52,11 +53,12 @@ export const SearchDinner = () => {
       setLoading(true);
       setDialogOpen(false);
       const result: Dinner = await editDinner(dinner);
-      const index = dinners.findIndex(d => d.id === dinner.id);
-      const updatedDinners = [ ...dinners ];
-      dinners.slice();
-      updatedDinners[ index ] = result;
-      setDinners(updatedDinners);
+      queryClient.setQueriesData(['dinners'], ((dinners: Dinner[] | undefined) => dinners?.map(dinner => {
+        if (dinner.id === result.id){
+          return result;
+        }
+        return dinner;
+      })));
     } catch ( e ) {
 
     } finally {
@@ -90,7 +92,7 @@ export const SearchDinner = () => {
                    variant="outlined"/>
         <Button onClick={dinnerSearch}>Search</Button>
       </div>
-      {loading && <LinearProgress></LinearProgress>}
+      {isFetching && <LinearProgress></LinearProgress>}
       <div className="dinner-list">
         {dinners?.map((dinner: Dinner) => (
           <DinnerCard
