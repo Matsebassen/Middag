@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Appl\\github\\Middag\\server\\MiddagApi.csproj": {}
+    "/Users/mats.gunnerod/github/Middag/server/MiddagApi.csproj": {}
   },
   "projects": {
-    "C:\\Appl\\github\\Middag\\server\\MiddagApi.csproj": {
+    "/Users/mats.gunnerod/github/Middag/server/MiddagApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Appl\\github\\Middag\\server\\MiddagApi.csproj",
+        "projectUniqueName": "/Users/mats.gunnerod/github/Middag/server/MiddagApi.csproj",
         "projectName": "MiddagApi",
-        "projectPath": "C:\\Appl\\github\\Middag\\server\\MiddagApi.csproj",
-        "packagesPath": "C:\\Users\\MSG.STATOIL-NET\\.nuget\\packages\\",
-        "outputPath": "C:\\Appl\\github\\Middag\\server\\obj\\",
+        "projectPath": "/Users/mats.gunnerod/github/Middag/server/MiddagApi.csproj",
+        "packagesPath": "/Users/mats.gunnerod/.nuget/packages/",
+        "outputPath": "/Users/mats.gunnerod/github/Middag/server/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\MSG.STATOIL-NET\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/Users/mats.gunnerod/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -71,7 +71,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -83,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.400/RuntimeIdentifierGraph.json"
         }
       }
     }
