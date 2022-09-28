@@ -77,7 +77,7 @@ export const ShoppingList = () => {
 
   const onSetIngredientType = async (ingredientTypeId: number | undefined) => {
     setShopItemMenu(null);
-    const ingredient = await setIngredientType(shopItemMenu?.shopItem?.ingredient?.id, ingredientTypeId);
+    await setIngredientType(shopItemMenu?.shopItem?.ingredient?.id, ingredientTypeId);
   }
 
   return (

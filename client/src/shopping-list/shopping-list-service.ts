@@ -1,7 +1,6 @@
 import {Ingredient, NameId, ShopItem} from '../models/shopItem';
 import axios from 'axios';
 import { API } from '../api';
-import {RecipeItem} from "../models/recipeItem";
 
 export const editIngredient = (shopItem: ShopItem): Promise<ShopItem> => {
   return axios.put(`${API}/ShopItems/${shopItem.id}`, shopItem)

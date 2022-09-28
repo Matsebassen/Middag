@@ -1,7 +1,7 @@
 import './shopping-item.scss';
 import { ShopItem } from '../models/shopItem';
 
-import {Card, CardActions, CardContent, CardHeader, IconButton, Input} from '@mui/material';
+import {Card, CardActions, CardContent, IconButton, Input} from '@mui/material';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CheckIcon from '@mui/icons-material/Check';
@@ -15,7 +15,6 @@ import soap from '../assets/soap.png'; // Import using relative path
 import vegetables from '../assets/vegetables.png'; // Import using relative path
 import cans from '../assets/cans.png';
 import cheese from '../assets/cheese.png';
-import unknown from '../assets/unknown.png';
 
 
 export const ShoppingItem = (props: {
