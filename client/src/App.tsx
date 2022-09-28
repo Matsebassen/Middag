@@ -11,10 +11,23 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#3f51b5',
+      main: '#508ca4'//main: '#3f51b5',
     },
     secondary: {
-      main: '#f50057',
+      50: '#fef2f4',
+      100: '#fde6ea',
+      200: '#fad1d9',
+      300: '#f5acba',
+      400: '#ef7d96',
+      main: '#e34a6f',//main: '#f50057',
+      600: '#cf2f5d',
+      700: '#af214e',
+      800: '#921f47',
+      900: '#7e1d42',
+
+    },
+    info: {
+      main: '#fff',
     }
   },
 });

@@ -2,17 +2,26 @@ import './shopping-list.scss';
 
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
-import { ShopItem } from '../models/shopItem';
+import {NameId, ShopItem} from '../models/shopItem';
 import { ShoppingItem } from './shopping-item';
-import { LinearProgress, TextField } from '@mui/material';
-import { addIngredient, editIngredient, toggleShopItem } from './shopping-list-service';
-import React, { useState } from 'react';
+import {LinearProgress, Menu, MenuItem, TextField} from '@mui/material';
+import {
+  addIngredient,
+  editIngredient,
+  getIngredientTypes,
+  setIngredientType,
+  toggleShopItem
+} from './shopping-list-service';
+import React, {Fragment, useEffect, useState} from 'react';
 import { API } from '../api';
 
 export const ShoppingList = () => {
   const [ ingredientInput, setIngredientInput ] = useState('');
   const [ editingIngredient, setEditingIngredient ] = useState(0);
   const [ loading, setLoading ] = useState(false);
+  const [ingredientTypes, setIngredientTypes] = useState([] as NameId[]);
+  const [ shopItemMenu, setShopItemMenu ] = useState<null | { anchorEl: HTMLElement, shopItem: ShopItem }>(null);
+  const menuOpen = Boolean(shopItemMenu);
 
 
   const { data: ingredients, mutate: mutateIngredients } = useSWR(
@@ -20,6 +29,14 @@ export const ShoppingList = () => {
     fetcher,
     { refreshInterval: 2000 }
   );
+
+  useEffect( () => {
+    (async () => {
+      const ingredientTypes = await getIngredientTypes();
+      setIngredientTypes(ingredientTypes);
+    })();
+    return () => {};
+  }, []);
 
   const onEditIngredient = async (shopItem: ShopItem) => {
     setLoading(true);
@@ -54,31 +71,56 @@ export const ShoppingList = () => {
     setLoading(false);
   }
 
+  function handleMenuClose() {
+    setShopItemMenu(null);
+  }
+
+  const onSetIngredientType = async (ingredientTypeId: number | undefined) => {
+    setShopItemMenu(null);
+    const ingredient = await setIngredientType(shopItemMenu?.shopItem?.ingredient?.id, ingredientTypeId);
+  }
+
   return (
-    <div>
-      <TextField className="ingredient-input"
-                 label="Add item"
-                 value={ingredientInput}
-                 onChange={(e) => setIngredientInput(e?.target?.value)}
-                 onKeyDown={(e) => onAddIngredient(e)}
-                 variant="outlined"/>
-      {loading && <LinearProgress></LinearProgress>}
-      <GroceryList ingredients={ingredients}
-                   haveBought={false}
-                   editingIngredient={editingIngredient}
-                   setEditingIngredient={setEditingIngredient}
-                   onEditIngredient={onEditIngredient}
-                   toggleHaveBought={onToggleHaveBought}
-      />
-      <h4>Recently used:</h4>
-      <GroceryList ingredients={ingredients}
-                   haveBought={true}
-                   editingIngredient={editingIngredient}
-                   setEditingIngredient={setEditingIngredient}
-                   onEditIngredient={onEditIngredient}
-                   toggleHaveBought={onToggleHaveBought}
-      />
-    </div>
+    <Fragment>
+      <Menu
+        id="basic-menu"
+        anchorEl={shopItemMenu?.anchorEl}
+        open={menuOpen}
+        onClose={handleMenuClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        {ingredientTypes.map(type => (
+          <MenuItem key={type.id} onClick={() => onSetIngredientType(type.id)}>{type.name}</MenuItem>))}
+      </Menu>
+      <div>
+        <TextField className="ingredient-input"
+                   label="Add item"
+                   value={ingredientInput}
+                   onChange={(e) => setIngredientInput(e?.target?.value)}
+                   onKeyDown={(e) => onAddIngredient(e)}
+                   variant="outlined"/>
+        {loading && <LinearProgress></LinearProgress>}
+        <GroceryList ingredients={ingredients}
+                     haveBought={false}
+                     editingIngredient={editingIngredient}
+                     setEditingIngredient={setEditingIngredient}
+                     onEditIngredient={onEditIngredient}
+                     toggleHaveBought={onToggleHaveBought}
+                     openMenu={(event, shopItem) => setShopItemMenu({anchorEl: event.currentTarget, shopItem})}
+        />
+        <h4>Recently used:</h4>
+        <GroceryList ingredients={ingredients}
+                     haveBought={true}
+                     editingIngredient={editingIngredient}
+                     setEditingIngredient={setEditingIngredient}
+                     onEditIngredient={onEditIngredient}
+                     toggleHaveBought={onToggleHaveBought}
+                     openMenu={(event, shopItem) => setShopItemMenu({anchorEl: event.currentTarget, shopItem})}
+        />
+      </div>
+    </Fragment>
   );
 };
 
@@ -89,12 +131,15 @@ const GroceryList = (props: {
   setEditingIngredient: (id: number) => void,
   toggleHaveBought: (id: number) => void,
   onEditIngredient: (ingredient: ShopItem) => void
+  openMenu: (event: React.MouseEvent<HTMLButtonElement>, shopItem: ShopItem) => void
 }) => {
   return (
     <div className="shopping-list">
       {props.ingredients && props.ingredients
         .filter(grocery => (grocery.recentlyUsed > 0) === props.haveBought)
-        .sort((a, b) => props.haveBought ? b.recentlyUsed - a.recentlyUsed : b.id - a.id)
+        .sort((a, b) => props.haveBought
+          ? b.recentlyUsed - a.recentlyUsed
+          : (a.ingredient?.ingredientType?.order ?? 99) - (b.ingredient?.ingredientType?.order ?? 99))
         .map(grocery =>
           <ShoppingItem
             shopItem={grocery}
@@ -102,7 +147,8 @@ const GroceryList = (props: {
             editIngredient={props.onEditIngredient}
             toggleHaveBought={props.toggleHaveBought}
             isEditing={ props.editingIngredient === grocery.id}
-            setEdit={props.setEditingIngredient}/>
+            setEdit={props.setEditingIngredient}
+            openMenu={props.openMenu}/>
         )}
     </div>
   );

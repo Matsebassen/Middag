@@ -1,12 +1,21 @@
 import './shopping-item.scss';
 import { ShopItem } from '../models/shopItem';
 
-import { Card, CardActions, CardContent, IconButton, Input } from '@mui/material';
+import {Card, CardActions, CardContent, CardHeader, IconButton, Input} from '@mui/material';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import * as React from "react";
+import milk from '../assets/milk.png'; // Import using relative path
+import fish from '../assets/fish.png'; // Import using relative path
+import soap from '../assets/soap.png'; // Import using relative path
+import vegetables from '../assets/vegetables.png'; // Import using relative path
+import cans from '../assets/cans.png';
+import cheese from '../assets/cheese.png';
+import unknown from '../assets/unknown.png';
 
 
 export const ShoppingItem = (props: {
@@ -15,23 +24,58 @@ export const ShoppingItem = (props: {
   editIngredient: (ingredient: ShopItem) => void,
   toggleHaveBought: (id: number) => void,
   setEdit: (id: number) => void
+  openMenu: (event: React.MouseEvent<HTMLButtonElement>, shopItem: ShopItem) => void
 }) => {
   const theme = useTheme();
 
-  const backgroundColor = {
-    backgroundColor: (props.shopItem.recentlyUsed > 0) ? theme.palette.primary.light : theme.palette.secondary.light
+  const getBackgroundImage = (id: (number | undefined)) => {
+    if (!id) {
+      return null;
+    }
+    switch (id) {
+      case 1:
+        return milk;
+      case 2:
+        return fish;
+      case 3:
+        return vegetables;
+      case 4:
+        return cans;
+      case 5:
+        return soap;
+      case 6:
+        return cheese;
+    }
+  }
+
+  const background = () => {
+    return {
+      backgroundColor: (props.shopItem.recentlyUsed > 0) ? theme.palette.primary.main : theme.palette.secondary.main,
+      backgroundImage:  `url(${getBackgroundImage(props.shopItem.ingredient?.ingredientType?.id)})`,
+    }
   };
 
   const spanStyle = {
     fontSize: calculateFontSize(props.shopItem?.ingredient?.name)
   };
 
+
+  function onOpenMenu(event: React.MouseEvent<HTMLButtonElement>) {
+      event.stopPropagation();
+      props.openMenu(event, props.shopItem);
+  }
+
   return (
     <Card className="shopping-item"
           onClick={() => props.toggleHaveBought(props.shopItem.id)}>
       <CardContent
-        sx={{ backgroundColor }}
+        sx={ background }
         className="shopping-item__content">
+        <IconButton aria-label="settings"
+                    className="shopping-item__menu"
+                    onClick={ onOpenMenu}>
+          <MoreVertIcon color="info"/>
+        </IconButton>
         <div className="shopping-item__heading">
           {props.shopItem.ingredient?.name?.substring(0, 1)?.toUpperCase()}
         </div>

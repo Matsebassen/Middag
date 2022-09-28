@@ -11,10 +11,21 @@
     padding-top: 0;
   }
 
+  .MuiIconButton-root.shopping-item__menu{
+    position: absolute;
+    right: -4px;
+    z-index: 10;
+  }
+
   .MuiCardContent-root.shopping-item__content {
+    position: relative;
     height: 66%;
     padding: 0 8px 8px 8px;
     color: white;
+    background-repeat: no-repeat;
+    background-size: 30px;
+    background-position-x: 10%;
+    background-position-y: 10%;
   }
 
   &__actions{

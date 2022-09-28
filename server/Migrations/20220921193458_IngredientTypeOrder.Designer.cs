@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiddagApi.Models;
 
@@ -11,9 +12,10 @@ using MiddagApi.Models;
 namespace MiddagApi.Migrations
 {
     [DbContext(typeof(DinnerContext))]
-    partial class DinnerContextModelSnapshot : ModelSnapshot
+    [Migration("20220921193458_IngredientTypeOrder")]
+    partial class IngredientTypeOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
