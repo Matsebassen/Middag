@@ -15,6 +15,9 @@ import soap from '../assets/soap.png'; // Import using relative path
 import vegetables from '../assets/vegetables.png'; // Import using relative path
 import cans from '../assets/cans.png';
 import cheese from '../assets/cheese.png';
+import chocolate from '../assets/chocolate.png';
+import baking from '../assets/baking.png';
+
 
 
 export const ShoppingItem = (props: {
@@ -44,6 +47,10 @@ export const ShoppingItem = (props: {
         return soap;
       case 6:
         return cheese;
+      case 7:
+        return baking;
+      case 8:
+        return chocolate;
     }
   }
 
