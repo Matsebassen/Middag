@@ -212,8 +212,11 @@ namespace MiddagApi.Controllers
                 {
                     shopItem.Ingredient = ingredientItem;
                 }
-                shopItem.Ingredient = new IngredientItem();
-                shopItem.Ingredient.Name = shopItemName;
+                else
+                {
+                    shopItem.Ingredient = new IngredientItem();
+                    shopItem.Ingredient.Name = shopItemName;
+                }
                 shopItem.RecentlyUsed = 0;
                 shopItem.Description = "";
                 _context.ShopItems.Add(shopItem);
