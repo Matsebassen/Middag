@@ -1,3 +1,5 @@
 ./node_modules
 ./server/bin
 server/appsettings.Development.json
+./server/obj
+server/bin/
