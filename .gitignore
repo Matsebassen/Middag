@@ -1,5 +1,6 @@
 ./node_modules
 ./server/bin
-server/appsettings.Development.json
 ./server/obj
+server/appsettings.Development.json
 server/bin/
+server/obj/
