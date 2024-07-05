@@ -15,6 +15,8 @@ namespace MiddagApi.Models
         public DbSet<IngredientItem> IngredientItem { get; set; } = null!;
         public DbSet<RecipeItem> RecipeItem { get; set; } = null!;
         public DbSet<IngredientType> IngredientTypes { get; set; } = null!;
+        public DbSet<ShopCategory> ShopCategories { get; set; } = null!;
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

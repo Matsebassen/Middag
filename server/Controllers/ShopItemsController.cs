@@ -21,16 +21,17 @@ namespace MiddagApi.Controllers
         }
 
         // GET: api/ShopItems
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ShopItem>>> GetShopItems()
+        [HttpGet("{categoryId}")]
+        public async Task<ActionResult<IEnumerable<ShopItem>>> GetShopItems(long categoryId)
         {
             if (_context.ShopItems == null)
             {
                 return NotFound();
             }
-            return await _context.ShopItems
+            return await _context.ShopItems.Include(item => item.Category)
               .Include(item => item.Ingredient)
               .ThenInclude(ingredient => ingredient.ingredientType)
+              .Where(item => categoryId == 1 ? item.Category.ID == categoryId || item.Category.ID == null : item.Category != null && item.Category.ID == categoryId)
               .ToListAsync();
         }
 
@@ -45,6 +46,8 @@ namespace MiddagApi.Controllers
             return await _context.IngredientTypes.OrderBy(i => i.order)
               .ToListAsync();
         }
+
+
 
         // GET: api/ShopItems/setIngredientType
         [HttpPatch("setIngredientType/{ingredientId}/{ingredientTypeId}")]
@@ -66,24 +69,6 @@ namespace MiddagApi.Controllers
             await _context.SaveChangesAsync();
 
             return ingredientItem;
-        }
-
-        // GET: api/ShopItems/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ShopItem>> GetShopItem(long id)
-        {
-            if (_context.ShopItems == null)
-            {
-                return NotFound();
-            }
-            var shopItem = await _context.ShopItems.FindAsync(id);
-
-            if (shopItem == null)
-            {
-                return NotFound();
-            }
-
-            return shopItem;
         }
 
         // PUT: api/ShopItems/5
@@ -124,6 +109,7 @@ namespace MiddagApi.Controllers
         {
             var shopItem = await _context.ShopItems
               .Include(item => item.Ingredient)
+              .Include(item => item.Category)
               .SingleOrDefaultAsync(i => i.ID == id);
             if (shopItem == null)
             {
@@ -144,9 +130,10 @@ namespace MiddagApi.Controllers
 
                 // Delete the older recent item if more than 10 recent items exist
                 var recentItems = await _context.ShopItems
+                  .Where(s => s.Category == shopItem.Category)
                   .Where(s => s.RecentlyUsed > 0)
                   .ToArrayAsync();
-                if (recentItems.Length > 10)
+                if (recentItems.Length > 9)
                 {
                     var itemToDelete = recentItems
                       .First(item => item.RecentlyUsed == recentItems.Min(ri => ri.RecentlyUsed));
@@ -173,15 +160,20 @@ namespace MiddagApi.Controllers
             {
                 return Problem("Ingredient name is empty");
             }
+
+            if (shopItem.Category?.ID == null)
+            {
+                return Problem("Category is empty");
+            }
             var shopItemName = shopItem.Ingredient.Name;
-            shopItem = await AddIngredientToList(shopItemName);
+            shopItem = await AddIngredientToList(shopItemName, shopItem.Category.ID);
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetShopItem", new { id = shopItem.ID }, shopItem);
+            return CreatedAtAction("PostShopItem", new { id = shopItem.ID }, shopItem);
         }
 
-        private async Task<ShopItem> AddIngredientToList(string shopItemName)
+        private async Task<ShopItem> AddIngredientToList(string shopItemName, long? categoryId)
         {
             var existingShopItem = await _context.ShopItems
             .Include(s => s.Ingredient)
@@ -219,6 +211,7 @@ namespace MiddagApi.Controllers
                 }
                 shopItem.RecentlyUsed = 0;
                 shopItem.Description = "";
+                shopItem.Category = await _context.ShopCategories.FindAsync(categoryId);
                 _context.ShopItems.Add(shopItem);
                 return shopItem;
             }
@@ -246,7 +239,7 @@ namespace MiddagApi.Controllers
             {
                 if (recipeItem.Ingredient != null && recipeItem.Ingredient.Name != null)
                 {
-                    await AddIngredientToList(recipeItem.Ingredient.Name);
+                    await AddIngredientToList(recipeItem.Ingredient.Name, 1);
                 }
             }
 

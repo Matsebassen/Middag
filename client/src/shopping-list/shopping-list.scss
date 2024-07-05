@@ -2,9 +2,45 @@
   margin: 32px;
 }
 
+.shopping-list_loading{
+  margin-top: 64px;
+}
+
 .shopping-list{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.grocery-list{
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
 }
+
+.shopping-list-categories{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  &__grid{
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    margin-bottom: 32px;
+
+    &-icon{
+     justify-content: start;
+     width: fit-content;
+    }
+  }
+  &__new{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+}
+

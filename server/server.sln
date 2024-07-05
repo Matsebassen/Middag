@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiddagApi", "MiddagApi.csproj", "{F675D70B-03D8-4D4D-A16B-9504E7900B5F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F675D70B-03D8-4D4D-A16B-9504E7900B5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F675D70B-03D8-4D4D-A16B-9504E7900B5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F675D70B-03D8-4D4D-A16B-9504E7900B5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F675D70B-03D8-4D4D-A16B-9504E7900B5F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {92715BB3-BF15-498D-B274-44155E0ADBD2}
+	EndGlobalSection
+EndGlobal

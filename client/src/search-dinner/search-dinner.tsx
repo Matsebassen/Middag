@@ -1,28 +1,50 @@
-import './search-dinner.scss';
-import React, {useState} from 'react';
-import {useQuery, useQueryClient} from "@tanstack/react-query";
-import { addDinnerToShoppingList, editDinner, searchDinner } from './search-dinner-service';
-import { Dinner } from '../models/dinner';
-import { DinnerCard } from './dinner-card';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { Dinner } from "../models/dinner";
+import { DinnerCard } from "./dinner-card";
+import {
+  addDinnerToShoppingList,
+  editDinner,
+  searchDinner,
+} from "./search-dinner-service";
+import "./search-dinner.scss";
 
-import {Button, LinearProgress, Menu, MenuItem, Snackbar, TextField} from '@mui/material';
-import EditDinnerDialog from './edit-dinner-dialog';
+import {
+  Button,
+  LinearProgress,
+  Menu,
+  MenuItem,
+  Snackbar,
+  TextField,
+} from "@mui/material";
+import EditDinnerDialog from "./edit-dinner-dialog";
 
 export const SearchDinner = () => {
-  const [ searchInput, setSearchInput ] = useState('');
-  const [ dialogOpen, setDialogOpen ] = useState(false);
-  const [ anchorEl, setAnchorEl ] = useState<null | HTMLElement>(null);
-  const [ currentDinner, setCurrentDinner ] = useState<null | Dinner>(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [currentDinner, setCurrentDinner] = useState<null | Dinner>(null);
   // eslint-disable-next-line
-  const [ loading, setLoading ] = useState<boolean>(false);
-  const [ snackbarOpen, setSnackbarOpen ] = useState(false);
-  const [ snackbarMsg, setSnackbarMsg ] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
 
-  const queryClient = useQueryClient()
-  const {data: dinners, isFetching, ...dinnersQuery} = useQuery(['dinners', searchInput], () => searchDinner(searchInput), {enabled: false})
+  const queryClient = useQueryClient();
+  const {
+    data: dinners,
+    isFetching,
+    ...dinnersQuery
+  } = useQuery({
+    queryKey: ["dinners", searchInput],
+    queryFn: () => searchDinner(searchInput),
+    enabled: false,
+  });
 
   const open = Boolean(anchorEl);
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>, dinner: Dinner) => {
+  const handleMenuClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    dinner: Dinner
+  ) => {
     setAnchorEl(event.currentTarget);
     setCurrentDinner(dinner);
   };
@@ -31,18 +53,17 @@ export const SearchDinner = () => {
   };
 
   const onInputKeyDown = async (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if ( e.key === 'Enter' ) {
+    if (e.key === "Enter") {
       await dinnerSearch();
     }
-  }
+  };
 
-
-    const dinnerSearch = async () => {
-      await dinnersQuery.refetch();
+  const dinnerSearch = async () => {
+    await dinnersQuery.refetch();
   };
 
   const openDinnerDialog = async () => {
-    if ( currentDinner?.id ) {
+    if (currentDinner?.id) {
       handleMenuClose();
       setDialogOpen(true);
     }
@@ -53,28 +74,28 @@ export const SearchDinner = () => {
       setLoading(true);
       setDialogOpen(false);
       const result: Dinner = await editDinner(dinner);
-      queryClient.setQueriesData(['dinners'], ((dinners: Dinner[] | undefined) => dinners?.map(dinner => {
-        if (dinner.id === result.id){
-          return result;
-        }
-        return dinner;
-      })));
-    } catch ( e ) {
-
+      queryClient.setQueryData(["dinners"], (dinners: Dinner[] | undefined) =>
+        dinners?.map((dinner) => {
+          if (dinner.id === result.id) {
+            return result;
+          }
+          return dinner;
+        })
+      );
+    } catch (e) {
     } finally {
       setLoading(false);
     }
   };
 
   const addDinnerToList = async (dinner: Dinner) => {
-    if ( dinner?.id ) {
+    if (dinner?.id) {
       try {
         setLoading(true);
         const result = await addDinnerToShoppingList(dinner.id);
         setSnackbarMsg(result);
         setSnackbarOpen(true);
-      } catch ( e ) {
-
+      } catch (e) {
       } finally {
         setLoading(false);
       }
@@ -84,12 +105,14 @@ export const SearchDinner = () => {
   return (
     <div>
       <div className="search-dinner">
-        <TextField className="search-input"
-                   label="Search"
-                   value={searchInput}
-                   onChange={(e) => setSearchInput(e?.target?.value)}
-                   onKeyDown={onInputKeyDown}
-                   variant="outlined"/>
+        <TextField
+          className="search-input"
+          label="Search"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e?.target?.value)}
+          onKeyDown={onInputKeyDown}
+          variant="outlined"
+        />
         <Button onClick={dinnerSearch}>Search</Button>
       </div>
       {isFetching && <LinearProgress></LinearProgress>}
@@ -103,20 +126,21 @@ export const SearchDinner = () => {
           />
         ))}
       </div>
-      {currentDinner &&
-      <EditDinnerDialog
+      {currentDinner && (
+        <EditDinnerDialog
           open={dialogOpen}
           dinner={currentDinner}
           handleSave={(dinner: Dinner) => saveDinner(dinner)}
-          handleClose={() => setDialogOpen(false)}/>
-      }
+          handleClose={() => setDialogOpen(false)}
+        />
+      )}
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleMenuClose}
         MenuListProps={{
-          'aria-labelledby': 'basic-button',
+          "aria-labelledby": "basic-button",
         }}
       >
         <MenuItem onClick={openDinnerDialog}>Edit</MenuItem>
@@ -126,9 +150,8 @@ export const SearchDinner = () => {
         autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
         message={snackbarMsg}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       />
     </div>
-  )
-}
-
+  );
+};
