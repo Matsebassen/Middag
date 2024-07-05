@@ -1,0 +1,4 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/579e5540-9776-42a8-971d-b122b718ae72/resourceGroups/MiddagRG/providers/Microsoft.Web/sites/middagApi",
+  "appService.deploySubpath": "server"
+}

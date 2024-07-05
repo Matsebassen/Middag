@@ -536,9 +536,15 @@ C:/Appl/github/Middag/server/bin/Debug/net6.0/runtimes/win-x64/native/Microsoft.
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/staticwebassets.build.json
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/staticwebassets.development.json
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/scopedcss/bundle/MiddagApi.styles.css
-/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/MiddagApi.csproj.CopyComplete
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/MiddagApi.dll
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/refint/MiddagApi.dll
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/MiddagApi.pdb
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/MiddagApi.genruntimeconfig.cache
 /Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/ref/MiddagApi.dll
+/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/MiddagApi.sourcelink.json
+/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/staticwebassets/msbuild.MiddagApi.Microsoft.AspNetCore.StaticWebAssets.props
+/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/staticwebassets/msbuild.build.MiddagApi.props
+/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/staticwebassets/msbuild.buildMultiTargeting.MiddagApi.props
+/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/staticwebassets/msbuild.buildTransitive.MiddagApi.props
+/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/staticwebassets.pack.json
+/Users/mats.gunnerod/github/Middag/server/obj/Debug/net6.0/MiddagApi.csproj.Up2Date
