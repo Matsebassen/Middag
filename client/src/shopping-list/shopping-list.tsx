@@ -81,8 +81,11 @@ const ShoppingListInternal = () => {
   const mutateShopItemAdd = (shopItem: ShopItem) => {
     const newShopItems: ShopItem[] = [...shopItems];
     const index = newShopItems.findIndex((item) => item.id === shopItem.id);
-    newShopItems[index] = shopItem;
+    newShopItems[index === -1 ? newShopItems.length : index] = shopItem;
     queryClient.setQueryData([SHOP_ITEMS_QUERY_KEY, category], newShopItems);
+    queryClient.invalidateQueries({
+      queryKey: [SHOP_ITEMS_QUERY_KEY, category],
+    });
   };
 
   const onToggleHaveBought = async (id: number) => {

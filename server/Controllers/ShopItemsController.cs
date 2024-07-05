@@ -128,16 +128,29 @@ namespace MiddagApi.Controllers
                 var nextRecentlyUsed = maxRecentlyUsed > 0 ? maxRecentlyUsed + 1 : 1;
                 shopItem.RecentlyUsed = nextRecentlyUsed;
 
+                ShopCategory shopItemCategory;
+                if (shopItem.Category == null)
+                {
+                    long defaultCategoryId = 1;
+                    var defaultCategory = await _context.ShopCategories.FindAsync(defaultCategoryId);
+                    shopItemCategory = defaultCategory;
+                }
+                else
+                {
+                    shopItemCategory = shopItem.Category;
+                }
+                
                 // Delete the older recent item if more than 10 recent items exist
                 var recentItems = await _context.ShopItems
-                  .Where(s => s.Category == shopItem.Category)
-                  .Where(s => s.RecentlyUsed > 0)
-                  .ToArrayAsync();
-                if (recentItems.Length > 9)
+                    .Where(s => s.Category == shopItemCategory || s.Category == null)
+                    .Where(s => s.RecentlyUsed > 0)
+                    .OrderBy(s => -s.RecentlyUsed) // Order by RecentlyUsed ascending
+                    .ToListAsync();
+
+                if (recentItems.Count > 9)
                 {
-                    var itemToDelete = recentItems
-                      .First(item => item.RecentlyUsed == recentItems.Min(ri => ri.RecentlyUsed));
-                    _context.ShopItems.Remove(itemToDelete);
+                    var itemsToDelete = recentItems.Skip(9); // Skip the first 9 items
+                    _context.ShopItems.RemoveRange(itemsToDelete); // Remove the rest
                 }
 
             }
