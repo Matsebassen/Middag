@@ -25,16 +25,25 @@
   align-items: center;
   gap: 16px;
 
-  &__grid{
-    display: grid;
-    align-items: center;
-    grid-template-columns: 1fr auto auto;
+  &__list{
+    display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-bottom: 32px;
+    padding: 0;
+    
+    &-item{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #ccc;     
+    }
+    &-item:hover{
+      background-color: #f9f9f9;
+    }
 
-    &-icon{
-     justify-content: start;
-     width: fit-content;
+    &-icons{
+     margin-left: auto;
     }
   }
   &__new{

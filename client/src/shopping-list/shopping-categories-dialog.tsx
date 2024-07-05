@@ -11,7 +11,7 @@ import {
   IconButton,
   TextField,
 } from "@mui/material";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import {
   useAddCategory,
   useDeleteCategory,
@@ -20,14 +20,18 @@ import {
 import { NameId } from "../models/shopItem";
 
 type ShoppingCategoriesDialogProps = {
+  currentCategory: number;
   categories: NameId[];
   isOpen: boolean;
+  setCurrentCategory: (category: number) => void;
   onClose: () => void;
 };
 
 export const ShoppingCategoriesDialog = ({
+  currentCategory,
   categories,
   isOpen,
+  setCurrentCategory,
   onClose,
 }: ShoppingCategoriesDialogProps) => {
   const { editCategory } = useEditCategory();
@@ -54,6 +58,13 @@ export const ShoppingCategoriesDialog = ({
     }
   };
 
+  const onDeleteCategory = async (id: number | undefined) => {
+    if (currentCategory === id) {
+      setCurrentCategory(1);
+    }
+    await deleteCategory(id);
+  };
+
   const onAddCategory = async () => {
     await addCategory(newCategoryName);
     setNewCategoryName("");
@@ -63,11 +74,14 @@ export const ShoppingCategoriesDialog = ({
     <Dialog onClose={onClose} open={isOpen} maxWidth="sm" fullWidth>
       <DialogTitle>Edit categories</DialogTitle>
       <DialogContent>
-        <div className="shopping-list-categories__grid">
+        <ul className="shopping-list-categories__list">
           {categories?.map((category) => {
             const isEditing = currentlyEditing === category.id;
             return (
-              <Fragment>
+              <li
+                className="shopping-list-categories__list-item"
+                key={category.id}
+              >
                 {isEditing ? (
                   <TextField
                     value={categoryName}
@@ -79,28 +93,26 @@ export const ShoppingCategoriesDialog = ({
                 ) : (
                   <span>{category.name}</span>
                 )}
+                <div className="shopping-list-categories__list-icons"></div>
                 <IconButton
                   color="primary"
-                  className="shopping-list-categories__grid-icon"
                   onClick={() => toggleEdit(category.id)}
                 >
                   {isEditing ? <CheckIcon /> : <EditIcon />}
                 </IconButton>
-                {category.id !== 1 ? (
-                  <IconButton
-                    onClick={() => deleteCategory(category.id)}
-                    color="error"
-                    className="shopping-list-categories__grid-icon"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                ) : (
-                  <div />
-                )}
-              </Fragment>
+
+                <IconButton
+                  disabled={category.id === 1}
+                  onClick={() => onDeleteCategory(category.id)}
+                  color="error"
+                  className="shopping-list-categories__list-icon"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </li>
             );
           })}
-        </div>
+        </ul>
         <div className="shopping-list-categories__new">
           <TextField
             label="New category"

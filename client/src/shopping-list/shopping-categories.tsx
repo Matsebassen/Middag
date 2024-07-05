@@ -39,8 +39,10 @@ export const ShoppingCategories = ({
         <SettingsIcon />
       </IconButton>
       <ShoppingCategoriesDialog
+        currentCategory={category}
         categories={categories ?? []}
         isOpen={settingsDialogOpen}
+        setCurrentCategory={setCategory}
         onClose={() => setSettingsDialogOpen(false)}
       />
     </div>
