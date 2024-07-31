@@ -74,7 +74,7 @@ namespace MiddagApi.Controllers
             var shopItemsWithCategory =  _context.ShopItems.Where(shopItem => shopItem.Category.ID == id);
             foreach (var shopItem in shopItemsWithCategory)
             {
-                shopItem.Category = defaultCategory;
+                shopItem.Category = null;
             }
 
             _context.Remove(category);

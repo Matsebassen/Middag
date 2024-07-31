@@ -31,7 +31,7 @@ namespace MiddagApi.Controllers
             return await _context.ShopItems.Include(item => item.Category)
               .Include(item => item.Ingredient)
               .ThenInclude(ingredient => ingredient.ingredientType)
-              .Where(item => categoryId == 1 ? item.Category.ID == categoryId || item.Category.ID == null : item.Category != null && item.Category.ID == categoryId)
+              .Where(item => item.Category != null && item.Category.ID == categoryId)
               .ToListAsync();
         }
 
@@ -127,18 +127,8 @@ namespace MiddagApi.Controllers
                   .MaxAsync(s => s.RecentlyUsed);
                 var nextRecentlyUsed = maxRecentlyUsed > 0 ? maxRecentlyUsed + 1 : 1;
                 shopItem.RecentlyUsed = nextRecentlyUsed;
-
-                ShopCategory shopItemCategory;
-                if (shopItem.Category == null)
-                {
-                    long defaultCategoryId = 1;
-                    var defaultCategory = await _context.ShopCategories.FindAsync(defaultCategoryId);
-                    shopItemCategory = defaultCategory;
-                }
-                else
-                {
-                    shopItemCategory = shopItem.Category;
-                }
+                var shopItemCategory = shopItem.Category;
+                
                 
                 // Delete the older recent item if more than 10 recent items exist
                 var recentItems = await _context.ShopItems
@@ -190,7 +180,8 @@ namespace MiddagApi.Controllers
         {
             var existingShopItem = await _context.ShopItems
             .Include(s => s.Ingredient)
-            .SingleOrDefaultAsync(si => si.Ingredient.Name.Equals(shopItemName));
+            .Include(s => s.Category)
+            .SingleOrDefaultAsync(si => si.Ingredient.Name.Equals(shopItemName) && si.Category.ID == categoryId);
             if (existingShopItem != null)
             {
                 // Already exists in shopping list
