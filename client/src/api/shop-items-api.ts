@@ -8,7 +8,7 @@ export const SHOP_ITEMS_QUERY_KEY = "shopItems";
 export const useFetchShopItems = (categoryId: number) => {
   const query = useSuspenseQuery({
     queryKey: [SHOP_ITEMS_QUERY_KEY, categoryId],
-    refetchInterval: 2000,
+    //refetchInterval: 2000,
     queryFn: () =>
       axios
         .get<ShopItem[]>(`${API}/ShopItems/${categoryId}`)

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MiddagApi.Models;
 using Microsoft.Extensions.Configuration;
+using MiddagApi.Controllers;
 
 
 var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -20,6 +21,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<DinnerContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("Middagdb")));
 
@@ -57,8 +59,16 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
-
+app.UseRouting();
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<NotificationHub>("/notificationHub");
+});
+
+
+
+
 
 app.MapControllers();
 

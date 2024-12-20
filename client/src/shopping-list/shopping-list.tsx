@@ -8,8 +8,15 @@ import {
   TextField,
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { Fragment, Suspense, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { SHOP_ITEMS_QUERY_KEY, useFetchShopItems } from "../api/shop-items-api";
+import { useSignalR } from "../hooks/useSignalR";
 import { NameId, ShopItem } from "../models/shopItem";
 import { ShoppingCategories } from "./shopping-categories";
 import { ShoppingItem } from "./shopping-item";
@@ -38,10 +45,11 @@ export const ShoppingList = () => {
 
 const ShoppingListInternal = () => {
   const queryClient = useQueryClient();
+  const { connection } = useSignalR();
   const [ingredientInput, setIngredientInput] = useState("");
   const [editingIngredient, setEditingIngredient] = useState(0);
   const [category, setCategory] = useState(1);
-  const { shopItems } = useFetchShopItems(category);
+  const { shopItems, refetch } = useFetchShopItems(category);
   const [loading, setLoading] = useState(false);
   const [ingredientTypes, setIngredientTypes] = useState([] as NameId[]);
 
@@ -78,15 +86,45 @@ const ShoppingListInternal = () => {
     }
   };
 
-  const mutateShopItemAdd = (shopItem: ShopItem) => {
-    const newShopItems: ShopItem[] = [...shopItems];
-    const index = newShopItems.findIndex((item) => item.id === shopItem.id);
-    newShopItems[index === -1 ? newShopItems.length : index] = shopItem;
-    queryClient.setQueryData([SHOP_ITEMS_QUERY_KEY, category], newShopItems);
-    queryClient.invalidateQueries({
-      queryKey: [SHOP_ITEMS_QUERY_KEY, category],
-    });
-  };
+  const mutateShopItemAdd = useCallback(
+    (shopItem: ShopItem) => {
+      queryClient.setQueryData(
+        [SHOP_ITEMS_QUERY_KEY, category],
+        (old: ShopItem[] | undefined) => {
+          const newShopItems = old ? [...old] : [];
+          const index = newShopItems.findIndex(
+            (item) => item.id === shopItem.id
+          );
+          newShopItems[index === -1 ? newShopItems.length : index] = shopItem;
+          return newShopItems;
+        }
+      );
+    },
+    [category, queryClient]
+  );
+
+  const onToggled = useCallback(
+    (shopItem: ShopItem) => {
+      console.log("onToggled");
+      if (shopItem.category?.id === category || !shopItem.category) {
+        mutateShopItemAdd(shopItem);
+      }
+    },
+    [category, mutateShopItemAdd]
+  );
+
+  useEffect(() => {
+    if (connection && connection.state === "Disconnected") {
+      connection.start();
+      connection?.on("ToggleShopItem", onToggled);
+    }
+    return () => {
+      if (connection && connection.state === "Connected") {
+        console.log("disconnecting");
+        connection?.stop();
+      }
+    };
+  }, [connection, onToggled]);
 
   const onToggleHaveBought = async (id: number) => {
     setLoading(true);

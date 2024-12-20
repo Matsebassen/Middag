@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MiddagApi.Models;
 
@@ -13,11 +14,13 @@ namespace MiddagApi.Controllers
     [ApiController]
     public class ShopItemsController : ControllerBase
     {
+        private readonly IHubContext<NotificationHub> _hubContext;
         private readonly DinnerContext _context;
 
-        public ShopItemsController(DinnerContext context)
+        public ShopItemsController(DinnerContext context, IHubContext<NotificationHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         // GET: api/ShopItems
@@ -145,6 +148,7 @@ namespace MiddagApi.Controllers
 
             }
             await _context.SaveChangesAsync();
+            await _hubContext.Clients.All.SendAsync("ToggleShopItem", shopItem);
 
             return Ok(shopItem);
         }
