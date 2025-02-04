@@ -101,6 +101,7 @@ namespace MiddagApi.Controllers
             }
 
             var response = shopItem.Adapt<ShopItemResponse>();
+            await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
             return Ok(response);
         }
 
@@ -165,6 +166,7 @@ namespace MiddagApi.Controllers
             var shopItem = await AddIngredientToList(item.Name, item.CategoryId);
             await _context.SaveChangesAsync();
             var response = shopItem.Adapt<ShopItemResponse>();
+            await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
             return CreatedAtAction("PostShopItem", new { id = response.ID }, response);
         }
 
