@@ -1,7 +1,6 @@
 import axios from "axios";
 import { API } from "../api";
 import { ShopItem } from "../models/shopItem";
-import { NameId } from "../models/name-id";
 
 export const editIngredient = (shopItem: ShopItem): Promise<ShopItem> => {
   return axios

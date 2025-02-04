@@ -8,7 +8,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { Fragment, Suspense, useEffect, useState } from "react";
+import React, { Fragment, Suspense, useState } from "react";
 import { SHOP_ITEMS_QUERY_KEY, useFetchShopItems, useGetIngredientTypes } from "../api/shop-items-api";
 import { ShopItem } from "../models/shopItem";
 import { ShoppingCategories } from "./shopping-categories";
@@ -19,7 +19,6 @@ import {
   setIngredientType,
   toggleShopItem,
 } from "./shopping-list-service";
-import { NameId } from "../models/name-id";
 
 export const ShoppingList = () => {
   return (
