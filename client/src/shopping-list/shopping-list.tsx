@@ -95,14 +95,11 @@ const ShoppingListInternal = () => {
       );
     }
 
-  const onToggled = useCallback(
-    (shopItem: ShopItem) => {
+  const onToggled = (shopItem: ShopItem) => {
       if (shopItem.categoryId === category) {
         mutateShopItemAdd(shopItem);
       }
-    },
-    [category, mutateShopItemAdd]
-  );
+    }
 
   useEffect(() => {
     if (connection && connection.state === "Disconnected") {
