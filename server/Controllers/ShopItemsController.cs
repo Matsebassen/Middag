@@ -107,7 +107,7 @@ namespace MiddagApi.Controllers
         // PATCH: api/ShopItems/toggle/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("toggle/{id}")]
-        public async Task<IActionResult> ToggleShopItem(long id)
+        public async Task<ActionResult<ShopItemResponse>> ToggleShopItem(long id)
         {
             var shopItem = await _context.ShopItems
               .Include(item => item.Ingredient)
@@ -147,9 +147,9 @@ namespace MiddagApi.Controllers
 
             }
             await _context.SaveChangesAsync();
-            await _hubContext.Clients.All.SendAsync("ToggleShopItem", shopItem);
-
-            return Ok(shopItem);
+            var response = shopItem.Adapt<ShopItemResponse>();
+            await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
+            return Ok(response);
         }
 
         // POST: api/ShopItems
@@ -164,7 +164,8 @@ namespace MiddagApi.Controllers
             
             var shopItem = await AddIngredientToList(item.Name, item.CategoryId);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("PostShopItem", new { id = shopItem.ID }, shopItem);
+            var response = shopItem.Adapt<ShopItemResponse>();
+            return CreatedAtAction("PostShopItem", new { id = response.ID }, response);
         }
 
         private async Task<ShopItem> AddIngredientToList(string shopItemName, long? categoryId)
