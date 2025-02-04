@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using MiddagApi.Models;
 
 namespace MiddagApi.Controllers
@@ -95,7 +90,7 @@ namespace MiddagApi.Controllers
             var foundCategory = await _context.ShopCategories.FindAsync(category.ID);
             if (foundCategory == null)
             {
-                return Problem("Category not found");
+                return NotFound("Category not found");
             }
 
             foundCategory.Name = category.Name;

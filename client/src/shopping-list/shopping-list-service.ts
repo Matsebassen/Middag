@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API } from "../api";
-import { Ingredient, NameId, ShopItem } from "../models/shopItem";
+import { ShopItem } from "../models/shopItem";
 
 export const editIngredient = (shopItem: ShopItem): Promise<ShopItem> => {
   return axios
@@ -10,13 +10,13 @@ export const editIngredient = (shopItem: ShopItem): Promise<ShopItem> => {
 
 export const addIngredient = (
   name: string,
-  category: number
+  categoryId: number
 ): Promise<ShopItem> => {
   const ingredient: ShopItem = {
-    ingredient: { name: name },
+    name,
     recentlyUsed: 0,
     id: 0,
-    category: { id: category, name: "" },
+    categoryId,
   };
   return axios.post(`${API}/ShopItems`, ingredient).then((res) => res.data);
 };
@@ -25,14 +25,10 @@ export const toggleShopItem = (id: number): Promise<ShopItem> => {
   return axios.patch(`${API}/ShopItems/toggle/${id}`).then((res) => res.data);
 };
 
-export const getIngredientTypes = (): Promise<NameId[]> => {
-  return axios.get(`${API}/ShopItems/ingredientTypes`).then((res) => res.data);
-};
-
 export const setIngredientType = (
   ingredientId: number | undefined,
   ingredientTypeId: number | undefined
-): Promise<Ingredient> => {
+): Promise<void> => {
   return axios
     .patch(
       `${API}/ShopItems/setIngredientType/${ingredientId}/${ingredientTypeId}`

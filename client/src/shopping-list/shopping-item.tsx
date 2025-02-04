@@ -31,6 +31,7 @@ export const ShoppingItem = (props: {
   const theme = useTheme();
 
   const getBackgroundImage = (id: (number | undefined)) => {
+
     if (!id) {
       return null;
     }
@@ -57,12 +58,12 @@ export const ShoppingItem = (props: {
   const background = () => {
     return {
       backgroundColor: (props.shopItem.recentlyUsed > 0) ? theme.palette.primary.main : theme.palette.secondary.main,
-      backgroundImage:  `url(${getBackgroundImage(props.shopItem.ingredient?.ingredientType?.id)})`,
+      backgroundImage:  `url(${getBackgroundImage(props.shopItem.ingredientTypeId)})`,
     }
   };
 
   const spanStyle = {
-    fontSize: calculateFontSize(props.shopItem?.ingredient?.name)
+    fontSize: calculateFontSize(props.shopItem.name)
   };
 
 
@@ -83,10 +84,10 @@ export const ShoppingItem = (props: {
           <MoreVertIcon color="info"/>
         </IconButton>
         <div className="shopping-item__heading">
-          {props.shopItem.ingredient?.name?.substring(0, 1)?.toUpperCase()}
+          {props.shopItem.name?.substring(0, 1)?.toUpperCase()}
         </div>
         <span style={spanStyle}>
-          {props.shopItem.ingredient?.name}
+          {props.shopItem.name}
         </span>
       </CardContent>
       <CardActions onClick={(e) => e.stopPropagation()}>

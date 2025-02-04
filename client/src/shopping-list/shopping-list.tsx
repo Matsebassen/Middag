@@ -11,19 +11,18 @@ import { useQueryClient } from "@tanstack/react-query";
 import React, {
   Fragment,
   Suspense,
-  useCallback,
   useEffect,
+  useCallback,
   useState,
 } from "react";
-import { SHOP_ITEMS_QUERY_KEY, useFetchShopItems } from "../api/shop-items-api";
+import { SHOP_ITEMS_QUERY_KEY, useFetchShopItems, useGetIngredientTypes } from "../api/shop-items-api";
 import { useSignalR } from "../hooks/useSignalR";
-import { NameId, ShopItem } from "../models/shopItem";
+import { ShopItem } from "../models/shopItem";
 import { ShoppingCategories } from "./shopping-categories";
 import { ShoppingItem } from "./shopping-item";
 import {
   addIngredient,
   editIngredient,
-  getIngredientTypes,
   setIngredientType,
   toggleShopItem,
 } from "./shopping-list-service";
@@ -51,20 +50,15 @@ const ShoppingListInternal = () => {
   const [category, setCategory] = useState(1);
   const { shopItems, refetch } = useFetchShopItems(category);
   const [loading, setLoading] = useState(false);
-  const [ingredientTypes, setIngredientTypes] = useState([] as NameId[]);
-
   const [shopItemMenu, setShopItemMenu] = useState<null | {
     anchorEl: HTMLElement;
     shopItem: ShopItem;
   }>(null);
+  
+  const { ingredientTypes } = useGetIngredientTypes();
+  
   const menuOpen = Boolean(shopItemMenu);
 
-  useEffect(() => {
-    (async () => {
-      const ingredientTypes = await getIngredientTypes();
-      setIngredientTypes(ingredientTypes);
-    })();
-  }, []);
 
   const onEditIngredient = async (shopItem: ShopItem) => {
     setLoading(true);
@@ -106,7 +100,7 @@ const ShoppingListInternal = () => {
   const onToggled = useCallback(
     (shopItem: ShopItem) => {
       console.log("onToggled");
-      if (shopItem.category?.id === category || !shopItem.category) {
+      if (shopItem.categoryId === category) {
         mutateShopItemAdd(shopItem);
       }
     },
@@ -140,7 +134,7 @@ const ShoppingListInternal = () => {
   const onSetIngredientType = async (ingredientTypeId: number | undefined) => {
     setShopItemMenu(null);
     await setIngredientType(
-      shopItemMenu?.shopItem?.ingredient?.id,
+      shopItemMenu?.shopItem?.ingredientId,
       ingredientTypeId
     );
   };
@@ -156,7 +150,7 @@ const ShoppingListInternal = () => {
           "aria-labelledby": "basic-button",
         }}
       >
-        {ingredientTypes.map((type) => (
+        {ingredientTypes?.map((type) => (
           <MenuItem key={type.id} onClick={() => onSetIngredientType(type.id)}>
             {type.name}
           </MenuItem>
@@ -223,8 +217,7 @@ const GroceryList = (props: {
           .sort((a, b) =>
             props.haveBought
               ? b.recentlyUsed - a.recentlyUsed
-              : (a.ingredient?.ingredientType?.order ?? 99) -
-                (b.ingredient?.ingredientType?.order ?? 99)
+              : (a.order ?? 99) - (b.order ?? 99)
           )
           .map((grocery) => (
             <ShoppingItem

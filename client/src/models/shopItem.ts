@@ -1,20 +1,10 @@
 export type ShopItem = {
   id: number;
+  ingredientId?: number;
   description?: string;
   recentlyUsed: number;
-  ingredient: Ingredient;
-  category: NameId;
-};
-
-export interface NameId {
   name: string;
-  id?: number;
-}
-
-export interface Ingredient extends NameId {
-  ingredientType?: IngredientType;
-}
-
-export interface IngredientType extends NameId {
+  ingredientTypeId?: number;
+  categoryId: number;
   order?: number;
-}
+};

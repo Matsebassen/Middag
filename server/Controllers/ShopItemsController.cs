@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -25,27 +26,22 @@ namespace MiddagApi.Controllers
 
         // GET: api/ShopItems
         [HttpGet("{categoryId}")]
-        public async Task<ActionResult<IEnumerable<ShopItem>>> GetShopItems(long categoryId)
+        public async Task<ActionResult<IEnumerable<ShopItemResponse>>> GetShopItems(long categoryId)
         {
-            if (_context.ShopItems == null)
-            {
-                return NotFound();
-            }
-            return await _context.ShopItems.Include(item => item.Category)
+            var shopItems= await _context.ShopItems.Include(item => item.Category)
               .Include(item => item.Ingredient)
               .ThenInclude(ingredient => ingredient.ingredientType)
               .Where(item => item.Category != null && item.Category.ID == categoryId)
               .ToListAsync();
+
+            var shopItemsDto = shopItems.Adapt<List<ShopItemResponse>>();
+            return Ok(shopItemsDto);
         }
 
         // GET: api/ShopItems/ingredientTypes
         [HttpGet("ingredientTypes")]
         public async Task<ActionResult<IEnumerable<IngredientType>>> GetIngredientTypes()
         {
-            if (_context.IngredientItem == null)
-            {
-                return NotFound();
-            }
             return await _context.IngredientTypes.OrderBy(i => i.order)
               .ToListAsync();
         }
@@ -77,12 +73,14 @@ namespace MiddagApi.Controllers
         // PUT: api/ShopItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutShopItem(long id, ShopItem shopItem)
+        public async Task<ActionResult<ShopItemResponse>> PutShopItem(long id, ShopItemResponse item)
         {
-            if (id != shopItem.ID)
+            if (id != item.ID)
             {
                 return BadRequest();
             }
+
+            var shopItem = item.Adapt<ShopItem>();
 
             _context.Entry(shopItem).State = EntityState.Modified;
 
@@ -102,7 +100,8 @@ namespace MiddagApi.Controllers
                 }
             }
 
-            return Ok(shopItem);
+            var response = shopItem.Adapt<ShopItemResponse>();
+            return Ok(response);
         }
 
         // PATCH: api/ShopItems/toggle/5
@@ -156,27 +155,15 @@ namespace MiddagApi.Controllers
         // POST: api/ShopItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ShopItem>> PostShopItem(ShopItem shopItem)
+        public async Task<ActionResult<ShopItemResponse>> PostShopItem(ShopItemResponse item)
         {
-            if (_context.ShopItems == null)
+            if (item.Name == null)
             {
-                return Problem("Entity set 'DinnerContext.ShopItems'  is null.");
+                return BadRequest("Name cannot be empty");
             }
-
-            if (shopItem.Ingredient == null)
-            {
-                return Problem("Ingredient name is empty");
-            }
-
-            if (shopItem.Category?.ID == null)
-            {
-                return Problem("Category is empty");
-            }
-            var shopItemName = shopItem.Ingredient.Name;
-            shopItem = await AddIngredientToList(shopItemName, shopItem.Category.ID);
-
+            
+            var shopItem = await AddIngredientToList(item.Name, item.CategoryId);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("PostShopItem", new { id = shopItem.ID }, shopItem);
         }
 
