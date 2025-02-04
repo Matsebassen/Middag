@@ -48,7 +48,7 @@ const ShoppingListInternal = () => {
   const [ingredientInput, setIngredientInput] = useState("");
   const [editingIngredient, setEditingIngredient] = useState(0);
   const [category, setCategory] = useState(1);
-  const { shopItems, refetch } = useFetchShopItems(category);
+  const { shopItems } = useFetchShopItems(category);
   const [loading, setLoading] = useState(false);
   const [shopItemMenu, setShopItemMenu] = useState<null | {
     anchorEl: HTMLElement;
