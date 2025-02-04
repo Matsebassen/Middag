@@ -48,7 +48,7 @@ const ShoppingListInternal = () => {
   const [ingredientInput, setIngredientInput] = useState("");
   const [editingIngredient, setEditingIngredient] = useState(0);
   const [category, setCategory] = useState(1);
-  const { shopItems } = useFetchShopItems(category);
+  const { shopItems, refetch } = useFetchShopItems(category);
   const [loading, setLoading] = useState(false);
   const [shopItemMenu, setShopItemMenu] = useState<null | {
     anchorEl: HTMLElement;
@@ -80,7 +80,7 @@ const ShoppingListInternal = () => {
     }
   };
 
-  const mutateShopItemAdd = 
+  const mutateShopItemAdd = useCallback(
     (shopItem: ShopItem) => {
       queryClient.setQueryData(
         [SHOP_ITEMS_QUERY_KEY, category],
@@ -93,13 +93,18 @@ const ShoppingListInternal = () => {
           return newShopItems;
         }
       );
-    }
+    },
+    [category, queryClient]
+  );
 
-  const onToggled = (shopItem: ShopItem) => {
+  const onToggled = useCallback(
+    (shopItem: ShopItem) => {
       if (shopItem.categoryId === category) {
         mutateShopItemAdd(shopItem);
       }
-    }
+    },
+    [category, mutateShopItemAdd]
+  );
 
   useEffect(() => {
     if (connection && connection.state === "Disconnected") {
