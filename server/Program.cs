@@ -17,6 +17,9 @@ builder.Services.AddCors(options =>
                       });
 });
 
+// Configure mappings for Mapster
+MappingConfig.ConfigureMappings();
+
 // Add services to the container.
 
 builder.Services.AddControllers();

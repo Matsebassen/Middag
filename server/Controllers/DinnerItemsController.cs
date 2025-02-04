@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MiddagApi.Models;
 
 namespace MiddagApi.Controllers
@@ -19,30 +20,24 @@ namespace MiddagApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DinnerItem>>> GetDinnerItems()
         {
-            if (_context.DinnerItems == null)
-            {
-                return NotFound();
-            }
-            return await _context.DinnerItems
-            .Include(d => d.Ingredients)
-            .ThenInclude(i => i.Ingredient)
-            .AsNoTracking()
-            .ToListAsync();
+            var dinners = await _context.DinnerItems
+                .Include(d => d.Ingredients)
+                .ThenInclude(i => i.Ingredient)
+                .AsNoTracking()
+                .ToListAsync();;
+            
+            return Ok(dinners);
         }
 
         // GET: api/DinnerItems/5
         [HttpGet("{id}")]
         public async Task<ActionResult<DinnerItem>> GetDinnerItem(long id)
         {
-            if (_context.DinnerItems == null)
-            {
-                return NotFound();
-            }
             var dinnerItem = await _context.DinnerItems
             .Include(d => d.Ingredients)
             .ThenInclude(i => i.Ingredient)
             .AsNoTracking()
-            .FirstOrDefaultAsync(d => d.ID == id);
+            .SingleOrDefaultAsync(d => d.ID == id);
 
             if (dinnerItem == null)
             {
@@ -56,38 +51,27 @@ namespace MiddagApi.Controllers
         [HttpGet("search/{search}")]
         public async Task<ActionResult<IEnumerable<DinnerItem>>> GetDinnerItems(string search)
         {
-            if (_context.DinnerItems == null)
-            {
-                return NotFound();
-            }
-            var dinners = from dinnerItem in _context.DinnerItems
-                              .Include(d => d.Ingredients)
-                              .ThenInclude(i => i.Ingredient)
-                          select dinnerItem;
-
-            if (!String.IsNullOrEmpty(search))
-            {
-                dinners = dinners.Where(d => d.Name.Contains(search) ||
-                  d.Ingredients.Any(i => i.Ingredient.Name.Contains(search)));
-            }
-
-            return await dinners.AsNoTracking().ToListAsync();
+            var dinners = await _context.DinnerItems
+                .Include(d => d.Ingredients)
+                .ThenInclude(i => i.Ingredient)
+                .Where(d => d.Name.Contains(search) ||
+                            d.Ingredients.Any(i => i.Ingredient.Name.Contains(search)))
+                .ToListAsync();
+            
+            return Ok(dinners);
         }
 
         // GET: api/DinnerItems/search
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<DinnerItem>>> GetAllDinnerItems()
         {
-            if (_context.DinnerItems == null)
-            {
-                return NotFound();
-            }
-            var dinners = from dinnerItem in _context.DinnerItems
+            var dinners = await _context.DinnerItems
                               .Include(d => d.Ingredients)
                               .ThenInclude(i => i.Ingredient)
-                          select dinnerItem;
-
-            return await dinners.AsNoTracking().ToListAsync();
+                              .AsNoTracking()
+                              .ToListAsync();
+                          
+            return Ok(dinners);
         }
 
         // PUT: api/DinnerItems/5
@@ -114,7 +98,7 @@ namespace MiddagApi.Controllers
                 {
                     // Delete any recipeItems that are removed from dinner
                     var deletedRecipeItems = dinnerInDb.Ingredients
-                      .Where(i => dinnerItem.Ingredients.FindIndex(ri => ri.ID == i.ID) > -1 ? false : true)
+                      .Where(i => dinnerItem.Ingredients.Any(ri => ri.ID != i.ID))
                       .ToList();
 
                     deletedRecipeItems.ForEach(deletedItem =>
@@ -124,35 +108,34 @@ namespace MiddagApi.Controllers
                 }
 
                 //Check whether recipeItems are new or modified
-                dinnerItem.Ingredients.ForEach(recipeItem =>
+                foreach (var recipeItem in dinnerItem.Ingredients)
                 {
-                    if (recipeItem.Ingredient != null && recipeItem.Ingredient.Name != null)
+                    if (recipeItem.Ingredient == null || recipeItem.Ingredient.Name == null) continue;
+                    
+                    if (recipeItem.ID != 0)
                     {
-                        if (recipeItem.ID != 0)
-                        {
-                            // Existing recipeItem. Check if ingredient has changed
-                            _context.Entry(recipeItem).State = EntityState.Modified;
-                            var recipeItemInDb = _context.RecipeItem
-                              .Where(r => r.ID == recipeItem.ID)
-                              .Include(r => r.Ingredient)
-                              .AsNoTracking()
-                              .FirstOrDefault();
+                        // Existing recipeItem. Check if ingredient has changed
+                        _context.Entry(recipeItem).State = EntityState.Modified;
+                        var recipeItemInDb = _context.RecipeItem
+                            .Where(r => r.ID == recipeItem.ID)
+                            .Include(r => r.Ingredient)
+                            .AsNoTracking()
+                            .FirstOrDefault();
 
-                            if (recipeItemInDb == null
+                        if (recipeItemInDb == null
                             || recipeItemInDb.Ingredient == null
                             || recipeItemInDb.Ingredient.Name != recipeItem.Ingredient.Name)
-                            {
-                                recipeItem.Ingredient = GetIngredientItem(recipeItem.Ingredient.Name);
-                            }
-                        }
-                        else
                         {
-                            // New recipeItem
                             recipeItem.Ingredient = GetIngredientItem(recipeItem.Ingredient.Name);
-                            _context.Entry(recipeItem).State = EntityState.Added;
                         }
                     }
-                });
+                    else
+                    {
+                        // New recipeItem
+                        recipeItem.Ingredient = GetIngredientItem(recipeItem.Ingredient.Name);
+                        _context.Entry(recipeItem).State = EntityState.Added;
+                    }
+                };
             }
 
             try
@@ -200,26 +183,23 @@ namespace MiddagApi.Controllers
         [HttpPost]
         public async Task<ActionResult<DinnerItem>> PostDinnerItem(DinnerItem dinnerItem)
         {
-            if (_context.DinnerItems == null)
-            {
-                return Problem("Entity set 'DinnerContext.DinnerItems'  is null.");
-            }
-
             if (dinnerItem.Ingredients != null)
             {
-                for (int i = 0; i < dinnerItem.Ingredients.Count; i++)
+                var ingredientsList = dinnerItem.Ingredients.ToList(); // Convert to List
+
+                foreach (var recipeItem in ingredientsList)
                 {
-                    var ingredient = dinnerItem.Ingredients[i];
-                    if (ingredient.Ingredient != null)
+                    if (recipeItem.Ingredient != null)
                     {
-                        var ingredientName = ingredient.Ingredient.Name;
+                        var ingredientName = recipeItem.Ingredient.Name;
                         var ingredientItem = _context.IngredientItem.FirstOrDefault(i => i.Name == ingredientName);
                         if (ingredientItem != null)
                         {
-                            dinnerItem.Ingredients[i].Ingredient = ingredientItem;
+                            recipeItem.Ingredient = ingredientItem;
                         }
                     }
                 }
+                dinnerItem.Ingredients = ingredientsList;
             }
             _context.DinnerItems.Add(dinnerItem);
             await _context.SaveChangesAsync();
@@ -231,10 +211,6 @@ namespace MiddagApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDinnerItem(long id)
         {
-            if (_context.DinnerItems == null)
-            {
-                return NotFound();
-            }
             var dinnerItem = await _context.DinnerItems.FindAsync(id);
             if (dinnerItem == null)
             {

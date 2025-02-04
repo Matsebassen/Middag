@@ -17,7 +17,7 @@ import {
   useDeleteCategory,
   useEditCategory,
 } from "../api/category-api";
-import { NameId } from "../models/shopItem";
+import { NameId } from "../models/name-id";
 
 type ShoppingCategoriesDialogProps = {
   currentCategory: number;

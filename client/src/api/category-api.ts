@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import axios from "axios";
 import { API } from "../api";
-import { NameId } from "../models/shopItem";
+import { NameId } from "../models/name-id";
 
 export const useFetchCategories = () => {
   const query = useSuspenseQuery({
