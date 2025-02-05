@@ -80,25 +80,19 @@ namespace MiddagApi.Controllers
                 return BadRequest();
             }
 
-            var shopItem = item.Adapt<ShopItem>();
-
-            _context.Entry(shopItem).State = EntityState.Modified;
-
-            try
+            var shopItem = await _context.ShopItems
+                .Include(s => s.Ingredient)
+                .ThenInclude(i => i.ingredientType)
+                .FirstOrDefaultAsync(s => s.ID == id);
+            
+            if (shopItem == null)
             {
-                await _context.SaveChangesAsync();
+                return NotFound("ShopItem not found");
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ShopItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            shopItem.Description = item.Description;
+            shopItem.RecentlyUsed = item.RecentlyUsed;
+            
+            await _context.SaveChangesAsync();
 
             var response = shopItem.Adapt<ShopItemResponse>();
             await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
