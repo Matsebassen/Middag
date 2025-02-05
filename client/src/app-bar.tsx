@@ -1,11 +1,11 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import { Button } from "@mui/material";
+import { Link } from "react-router-dom";
 
-import './app-bar.scss';
+import "./app-bar.scss";
 
 /*
 <IconButton
@@ -25,25 +25,24 @@ export const MiddagAppBar = () => {
       <AppBar position="fixed" className="app-bar">
         <Toolbar>
           <Link to="/search">
-            <LinkButton title='Search'/>
+            <LinkButton title="Search" />
           </Link>
           <Link to="/add">
-            <LinkButton title='Add dinner'/>
+            <LinkButton title="Add dinner" />
           </Link>
           <Link to="/list">
-            <LinkButton title='Shopping List'/>
+            <LinkButton title="Shopping List" />
           </Link>
         </Toolbar>
       </AppBar>
     </Box>
   );
-}
+};
 
-const LinkButton = (props: {title: string}) => {
+const LinkButton = (props: { title: string }) => {
   return (
-    <Button
-    sx={{ my: 2, color: 'white', display: 'block', flexGrow: 0 }}>
+    <Button sx={{ my: 2, color: "white", display: "block", flexGrow: 0 }}>
       {props.title}
-  </Button>
+    </Button>
   );
-}
+};

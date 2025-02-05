@@ -5,7 +5,7 @@ import { DinnerCard } from "./dinner-card";
 import {
   addDinnerToShoppingList,
   editDinner,
-  searchDinner,
+  searchDinner
 } from "./search-dinner-service";
 import "./search-dinner.scss";
 
@@ -15,7 +15,7 @@ import {
   Menu,
   MenuItem,
   Snackbar,
-  TextField,
+  TextField
 } from "@mui/material";
 import EditDinnerDialog from "./edit-dinner-dialog";
 
@@ -37,7 +37,7 @@ export const SearchDinner = () => {
   } = useQuery({
     queryKey: ["dinners", searchInput],
     queryFn: () => searchDinner(searchInput),
-    enabled: false,
+    enabled: false
   });
 
   const open = Boolean(anchorEl);
@@ -83,6 +83,7 @@ export const SearchDinner = () => {
         })
       );
     } catch (e) {
+      console.log("failed to save");
     } finally {
       setLoading(false);
     }
@@ -96,6 +97,7 @@ export const SearchDinner = () => {
         setSnackbarMsg(result);
         setSnackbarOpen(true);
       } catch (e) {
+        console.log("Failed to add dinner to list");
       } finally {
         setLoading(false);
       }
@@ -140,7 +142,7 @@ export const SearchDinner = () => {
         open={open}
         onClose={handleMenuClose}
         MenuListProps={{
-          "aria-labelledby": "basic-button",
+          "aria-labelledby": "basic-button"
         }}
       >
         <MenuItem onClick={openDinnerDialog}>Edit</MenuItem>

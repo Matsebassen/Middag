@@ -66,8 +66,9 @@ namespace MiddagApi.Controllers
             }
             ingredientItem.ingredientType = ingredientType;
             await _context.SaveChangesAsync();
+            var response = ingredientItem.Adapt<IngredientItemResponse>();
 
-            return ingredientItem;
+            return Ok(response);
         }
 
         // PUT: api/ShopItems/5
@@ -152,12 +153,12 @@ namespace MiddagApi.Controllers
         [HttpPost]
         public async Task<ActionResult<ShopItemResponse>> PostShopItem(ShopItemResponse item)
         {
-            if (item.Name == null)
+            if (item.IngredientItem.Name == null)
             {
                 return BadRequest("Name cannot be empty");
             }
             
-            var shopItem = await AddIngredientToList(item.Name, item.CategoryId);
+            var shopItem = await AddIngredientToList(item.IngredientItem.Name, item.CategoryId);
             await _context.SaveChangesAsync();
             var response = shopItem.Adapt<ShopItemResponse>();
             await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);

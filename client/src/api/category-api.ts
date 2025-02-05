@@ -1,7 +1,7 @@
 import {
   useMutation,
   useQueryClient,
-  useSuspenseQuery,
+  useSuspenseQuery
 } from "@tanstack/react-query";
 import axios from "axios";
 import { API } from "../api";
@@ -12,7 +12,7 @@ export const useFetchCategories = () => {
     queryKey: ["categories"],
     refetchOnWindowFocus: false,
     queryFn: () =>
-      axios.get<NameId[]>(`${API}/category`).then((res) => res.data),
+      axios.get<NameId[]>(`${API}/category`).then((res) => res.data)
   });
 
   return { ...query, categories: query.data };
@@ -29,7 +29,7 @@ export const useEditCategory = () => {
         ["categories"],
         (categories: NameId[] | undefined) =>
           categories?.map((c) => (c.id === category.id ? category : c))
-      ),
+      )
   });
 
   return { ...query, editCategory: query.mutateAsync };
@@ -42,13 +42,13 @@ export const useDeleteCategory = () => {
     mutationFn: (categoryId: number | undefined) =>
       axios
         .delete<void>(`${API}/category/${categoryId}`)
-        .then((res) => categoryId),
+        .then(() => categoryId),
     onSuccess: (categoryId) =>
       queryClient.setQueryData(
         ["categories"],
         (categories: NameId[] | undefined) =>
           categories?.filter((c) => c.id !== categoryId)
-      ),
+      )
   });
 
   return { ...query, deleteCategory: query.mutateAsync };
@@ -67,9 +67,9 @@ export const useAddCategory = () => {
         ["categories"],
         (categories: NameId[] | undefined) => [
           ...(categories || []),
-          { ...category },
+          { ...category }
         ]
-      ),
+      )
   });
 
   return { ...query, addCategory: query.mutateAsync };

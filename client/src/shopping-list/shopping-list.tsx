@@ -5,7 +5,7 @@ import {
   LinearProgress,
   Menu,
   MenuItem,
-  TextField,
+  TextField
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import React, {
@@ -13,9 +13,14 @@ import React, {
   Suspense,
   useEffect,
   useCallback,
-  useState,
+  useState
 } from "react";
-import { SHOP_ITEMS_QUERY_KEY, useFetchShopItems, useGetIngredientTypes } from "../api/shop-items-api";
+import {
+  SHOP_ITEMS_QUERY_KEY,
+  useFetchShopItems,
+  useGetIngredientTypes,
+  useSetIngredientType
+} from "../api/shop-items-api";
 import { useSignalR } from "../hooks/useSignalR";
 import { ShopItem } from "../models/shopItem";
 import { ShoppingCategories } from "./shopping-categories";
@@ -23,8 +28,7 @@ import { ShoppingItem } from "./shopping-item";
 import {
   addIngredient,
   editIngredient,
-  setIngredientType,
-  toggleShopItem,
+  toggleShopItem
 } from "./shopping-list-service";
 
 export const ShoppingList = () => {
@@ -54,11 +58,11 @@ const ShoppingListInternal = () => {
     anchorEl: HTMLElement;
     shopItem: ShopItem;
   }>(null);
-  
-  const { ingredientTypes } = useGetIngredientTypes();
-  
-  const menuOpen = Boolean(shopItemMenu);
 
+  const { ingredientTypes } = useGetIngredientTypes();
+  const { setIngredientType } = useSetIngredientType(category);
+
+  const menuOpen = Boolean(shopItemMenu);
 
   const onEditIngredient = async (shopItem: ShopItem) => {
     setLoading(true);
@@ -132,10 +136,10 @@ const ShoppingListInternal = () => {
 
   const onSetIngredientType = async (ingredientTypeId: number | undefined) => {
     setShopItemMenu(null);
-    await setIngredientType(
-      shopItemMenu?.shopItem?.ingredientId,
-      ingredientTypeId
-    );
+    await setIngredientType({
+      ingredientId: shopItemMenu?.shopItem?.ingredientItem.id,
+      ingredientTypeId: ingredientTypeId
+    });
   };
 
   return (
@@ -146,7 +150,7 @@ const ShoppingListInternal = () => {
         open={menuOpen}
         onClose={handleMenuClose}
         MenuListProps={{
-          "aria-labelledby": "basic-button",
+          "aria-labelledby": "basic-button"
         }}
       >
         {ingredientTypes?.map((type) => (
@@ -216,7 +220,7 @@ const GroceryList = (props: {
           .sort((a, b) =>
             props.haveBought
               ? b.recentlyUsed - a.recentlyUsed
-              : (a.order ?? 99) - (b.order ?? 99)
+              : (a.ingredientItem.order ?? 99) - (b.ingredientItem.order ?? 99)
           )
           .map((grocery) => (
             <ShoppingItem
