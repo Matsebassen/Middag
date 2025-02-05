@@ -7,8 +7,8 @@ public class MappingConfig
     public static void ConfigureMappings()
     {
         TypeAdapterConfig<IngredientItem, IngredientItemResponse>.NewConfig()
-            .Map(dest => dest.Order, src => src.ingredientType != null ? src.ingredientType.order : 0)
-            .Map(dest => dest.IngredientTypeId, src => src.ingredientType != null ? src.ingredientType.ID : 99);
+            .Map(dest => dest.Order, src => src.ingredientType != null ? src.ingredientType.order : 99)
+            .Map(dest => dest.IngredientTypeId, src => src.ingredientType != null ? src.ingredientType.ID : 0);
             
         TypeAdapterConfig<ShopItem, ShopItemResponse>.NewConfig()
             .Map(dest => dest.CategoryId, src => src.Category != null ? src.Category.ID : null)
