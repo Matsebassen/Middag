@@ -20,10 +20,6 @@ namespace MiddagApi.Controllers
         [HttpGet("")]
         public async Task<ActionResult<IEnumerable<ShopCategory>>> GetCategories()
         {
-            if (_context.ShopCategories == null)
-            {
-                return NotFound();
-            }
             return await _context.ShopCategories.OrderBy(i => i.Name)
                 .ToListAsync();
         }
@@ -46,7 +42,7 @@ namespace MiddagApi.Controllers
 
         // DELETE: api/category
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCategory(long? id)
+        public async Task<IActionResult> DeleteCategory(long? id)
         {
             if (id == null)
             {
@@ -61,12 +57,10 @@ namespace MiddagApi.Controllers
             var category = await _context.ShopCategories.FindAsync(id);
             if (category == null)
             {
-                return Problem("Category not found");
+                return NotFound("Category not found");
             }
-
-            long defaultCategoryId = 1;
-            var defaultCategory = await _context.ShopCategories.FindAsync(defaultCategoryId);
-            var shopItemsWithCategory =  _context.ShopItems.Where(shopItem => shopItem.Category.ID == id);
+            
+            var shopItemsWithCategory =  _context.ShopItems.Where(shopItem => shopItem.Category != null && shopItem.Category.ID == id);
             foreach (var shopItem in shopItemsWithCategory)
             {
                 shopItem.Category = null;
@@ -95,7 +89,7 @@ namespace MiddagApi.Controllers
 
             foundCategory.Name = category.Name;
             await _context.SaveChangesAsync();
-            return foundCategory;
+            return Ok(foundCategory);
         }
     }
 }
