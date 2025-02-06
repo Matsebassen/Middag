@@ -18,9 +18,7 @@ export const useFetchShopItems = (categoryId: number) => {
     //refetchInterval: 2000,
     queryFn: () =>
       axios
-        .get<
-          ShopItem[]
-        >(`${API}/ShopItems/${categoryId}`, { withCredentials: true })
+        .get<ShopItem[]>(`${API}/ShopItems/${categoryId}`)
         .then((res) => res.data)
   });
   return { ...query, shopItems: query.data };
