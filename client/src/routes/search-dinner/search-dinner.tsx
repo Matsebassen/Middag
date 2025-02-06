@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { Dinner } from "../models/dinner";
+import { Dinner } from "../../models/dinner";
 import { DinnerCard } from "./dinner-card";
 import {
   addDinnerToShoppingList,
@@ -18,6 +18,9 @@ import {
   TextField
 } from "@mui/material";
 import EditDinnerDialog from "./edit-dinner-dialog";
+import { AddCircleOutline } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { PageHeader } from "../../components/page-header";
 
 export const SearchDinner = () => {
   const [searchInput, setSearchInput] = useState("");
@@ -105,17 +108,26 @@ export const SearchDinner = () => {
   };
 
   return (
-    <div>
+    <div className="dinners">
+      <PageHeader>Middager</PageHeader>
+
+      <Link to="/add">
+        <Button className="new-dinner" startIcon={<AddCircleOutline />}>
+          Ny middag
+        </Button>
+      </Link>
       <div className="search-dinner">
         <TextField
           className="search-input"
-          label="Search"
+          label="Middag"
           value={searchInput}
           onChange={(e) => setSearchInput(e?.target?.value)}
           onKeyDown={onInputKeyDown}
           variant="outlined"
         />
-        <Button onClick={dinnerSearch}>Search</Button>
+        <Button variant="contained" onClick={dinnerSearch}>
+          Søk
+        </Button>
       </div>
       {isFetching && <LinearProgress></LinearProgress>}
       <div className="dinner-list">
@@ -145,7 +157,7 @@ export const SearchDinner = () => {
           "aria-labelledby": "basic-button"
         }}
       >
-        <MenuItem onClick={openDinnerDialog}>Edit</MenuItem>
+        <MenuItem onClick={openDinnerDialog}>Rediger</MenuItem>
       </Menu>
       <Snackbar
         open={snackbarOpen}

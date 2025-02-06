@@ -5,7 +5,8 @@ import {
   LinearProgress,
   Menu,
   MenuItem,
-  TextField
+  TextField,
+  Typography
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import React, {
@@ -20,9 +21,9 @@ import {
   useFetchShopItems,
   useGetIngredientTypes,
   useSetIngredientType
-} from "../api/shop-items-api";
-import { useSignalR } from "../hooks/useSignalR";
-import { ShopItem } from "../models/shopItem";
+} from "../../api/shop-items-api";
+import { useSignalR } from "../../hooks/useSignalR";
+import { ShopItem } from "../../models/shopItem";
 import { ShoppingCategories } from "./shopping-categories";
 import { ShoppingItem } from "./shopping-item";
 import {
@@ -30,13 +31,14 @@ import {
   editIngredient,
   toggleShopItem
 } from "./shopping-list-service";
+import { PageHeader } from "../../components/page-header";
 
 export const ShoppingList = () => {
   return (
     <Suspense
       fallback={
         <div>
-          <h1>Shopping list</h1>
+          <PageHeader>Handleliste</PageHeader>
           <CircularProgress className="shopping-list_loading" size={64} />
         </div>
       }
@@ -160,12 +162,12 @@ const ShoppingListInternal = () => {
         ))}
       </Menu>
       <div className="shopping-list">
-        <h1>Shopping list</h1>
+        <PageHeader>Handleliste</PageHeader>
         <ShoppingCategories category={category} setCategory={setCategory} />
 
         <TextField
           className="ingredient-input"
-          label="Add item"
+          label="Ny vare"
           value={ingredientInput}
           onChange={(e) => setIngredientInput(e?.target?.value)}
           onKeyDown={(e) => onAddIngredient(e)}
@@ -183,7 +185,7 @@ const ShoppingListInternal = () => {
             setShopItemMenu({ anchorEl: event.currentTarget, shopItem })
           }
         />
-        <h4>Recently used:</h4>
+        <h4>Historikk:</h4>
         <GroceryList
           ingredients={shopItems}
           haveBought={true}

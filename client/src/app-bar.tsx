@@ -25,13 +25,13 @@ export const MiddagAppBar = () => {
       <AppBar position="fixed" className="app-bar">
         <Toolbar>
           <Link to="/search">
-            <LinkButton title="Search" />
-          </Link>
-          <Link to="/add">
-            <LinkButton title="Add dinner" />
+            <LinkButton title="Middager" />
           </Link>
           <Link to="/list">
-            <LinkButton title="Shopping List" />
+            <LinkButton title="Handleliste" />
+          </Link>
+          <Link to="/list">
+            <LinkButton title="Planlegger" />
           </Link>
         </Toolbar>
       </AppBar>

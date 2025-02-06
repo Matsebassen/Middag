@@ -5,10 +5,11 @@ import {
   DialogContent,
   DialogTitle
 } from "@mui/material";
-import { Dinner } from "../models/dinner";
-import { DinnerForm } from "../shared/dinner-form";
+
 import { useRef } from "react";
 import { FormikProps } from "formik";
+import { DinnerForm } from "../../shared/dinner-form";
+import { Dinner } from "../../models/dinner";
 
 export const EditDinnerDialog = (props: {
   open: boolean;
@@ -27,15 +28,17 @@ export const EditDinnerDialog = (props: {
 
   return (
     <Dialog open={props.open} onClose={props.handleClose}>
-      <DialogTitle>Edit dinner</DialogTitle>
+      <DialogTitle>Rediger</DialogTitle>
       <DialogContent>
         <div>
           <DinnerForm dinner={props.dinner} formikRef={formikRef} />
         </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleClose}>Cancel</Button>
-        <Button onClick={saveDinner}>Save</Button>
+        <Button variant="contained" onClick={saveDinner}>
+          Lagre
+        </Button>
+        <Button onClick={props.handleClose}>Lukk</Button>
       </DialogActions>
     </Dialog>
   );

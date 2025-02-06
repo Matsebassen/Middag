@@ -1,5 +1,5 @@
 import "./shopping-item.scss";
-import { ShopItem } from "../models/shopItem";
+import { ShopItem } from "../../models/shopItem";
 
 import {
   Card,
@@ -15,14 +15,14 @@ import { useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import * as React from "react";
-import milk from "../assets/milk.png"; // Import using relative path
-import fish from "../assets/fish.png"; // Import using relative path
-import soap from "../assets/soap.png"; // Import using relative path
-import vegetables from "../assets/vegetables.png"; // Import using relative path
-import cans from "../assets/cans.png";
-import cheese from "../assets/cheese.png";
-import chocolate from "../assets/chocolate.png";
-import baking from "../assets/baking.png";
+import milk from "../../assets/milk.png"; // Import using relative path
+import fish from "../../assets/fish.png"; // Import using relative path
+import soap from "../../assets/soap.png"; // Import using relative path
+import vegetables from "../../assets/vegetables.png"; // Import using relative path
+import cans from "../../assets/cans.png";
+import cheese from "../../assets/cheese.png";
+import chocolate from "../../assets/chocolate.png";
+import baking from "../../assets/baking.png";
 
 export const ShoppingItem = (props: {
   shopItem: ShopItem;

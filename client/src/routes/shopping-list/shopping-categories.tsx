@@ -2,7 +2,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 import { IconButton, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
-import { useFetchCategories } from "../api/category-api";
+import { useFetchCategories } from "../../api/category-api";
 import { ShoppingCategoriesDialog } from "./shopping-categories-dialog";
 
 type ShoppingCategoriesProps = {
@@ -12,7 +12,7 @@ type ShoppingCategoriesProps = {
 
 export const ShoppingCategories = ({
   category,
-  setCategory,
+  setCategory
 }: ShoppingCategoriesProps) => {
   const { categories } = useFetchCategories();
 

@@ -1,5 +1,14 @@
-.app-bar{
+.app-bar {
+  .MuiToolbar-root {
+    display: flex;
+    gap: 2rem;
+  }
   a {
     text-decoration: none;
+
+    button {
+      font-size: 1.1rem;
+      text-transform: capitalize;
+    }
   }
 }

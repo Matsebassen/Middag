@@ -9,15 +9,15 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  TextField,
+  TextField
 } from "@mui/material";
 import { useState } from "react";
 import {
   useAddCategory,
   useDeleteCategory,
-  useEditCategory,
-} from "../api/category-api";
-import { NameId } from "../models/name-id";
+  useEditCategory
+} from "../../api/category-api";
+import { NameId } from "../../models/name-id";
 
 type ShoppingCategoriesDialogProps = {
   currentCategory: number;
@@ -32,7 +32,7 @@ export const ShoppingCategoriesDialog = ({
   categories,
   isOpen,
   setCurrentCategory,
-  onClose,
+  onClose
 }: ShoppingCategoriesDialogProps) => {
   const { editCategory } = useEditCategory();
   const { deleteCategory } = useDeleteCategory();
@@ -72,7 +72,7 @@ export const ShoppingCategoriesDialog = ({
 
   return (
     <Dialog onClose={onClose} open={isOpen} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit categories</DialogTitle>
+      <DialogTitle>Kategorier</DialogTitle>
       <DialogContent>
         <ul className="shopping-list-categories__list">
           {categories?.map((category) => {
@@ -121,13 +121,13 @@ export const ShoppingCategoriesDialog = ({
             onKeyUp={(event) => event.key === "Enter" && onAddCategory()}
           />
           <Button startIcon={<AddIcon />} onClick={onAddCategory}>
-            Add
+            Legg til
           </Button>
         </div>
       </DialogContent>
       <DialogActions>
         <Button variant="contained" onClick={onClose}>
-          Close
+          Lukk
         </Button>
       </DialogActions>
     </Dialog>

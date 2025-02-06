@@ -1,6 +1,6 @@
 import axios from "axios";
-import { API } from "../api";
-import { ShopItem } from "../models/shopItem";
+import { API } from "../../api";
+import { ShopItem } from "../../models/shopItem";
 
 export const editIngredient = (shopItem: ShopItem): Promise<ShopItem> => {
   return axios

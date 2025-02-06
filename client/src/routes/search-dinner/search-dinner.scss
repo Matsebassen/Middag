@@ -1,16 +1,25 @@
-.search-dinner{
+.dinners {
+  display: flex;
+  flex-direction: column;
+  .new-dinner {
+    align-self: center;
+    width: fit-content;
+  }
+}
+
+.search-dinner {
   display: flex;
   justify-content: center;
-  .search-input{
+  .search-input {
     margin: 32px 16px 32px 0;
   }
-  Button{
+  Button {
     height: 40px;
     align-self: center;
   }
 }
 
-.dinner-list{
+.dinner-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

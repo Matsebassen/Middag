@@ -1,4 +1,4 @@
-import { Dinner } from "../models/dinner";
+import { Dinner } from "../../models/dinner";
 import "./dinner-card.scss";
 
 import * as React from "react";
@@ -24,7 +24,7 @@ import {
   TableRow,
   Tooltip
 } from "@mui/material";
-import { RecipeItem } from "../models/recipeItem";
+import { RecipeItem } from "../../models/recipeItem";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -88,14 +88,14 @@ export const DinnerCard = (props: {
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          {props.dinner.portions} portions
+          {props.dinner.portions} porsjoner
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
         <Button onClick={() => props.addDinnerToList(props.dinner)}>
-          Add to list
+          Handle
         </Button>
-        <Button onClick={() => openInNewTab(props.dinner.url)}>Website</Button>
+        <Button onClick={() => openInNewTab(props.dinner.url)}>Nettside</Button>
         <ExpandMore
           expand={expanded}
           onClick={expandDinner}
@@ -118,16 +118,16 @@ export const DinnerCard = (props: {
 
 const IngredientsTable = (props: { ingredients: RecipeItem[] }) => {
   if (!props.ingredients?.length) {
-    return <div>Loading ingredients...</div>;
+    return <div>Laster ingredienser...</div>;
   }
   return (
     <TableContainer component={Paper} sx={{ boxShadow: "none" }}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell align="right">Qty</TableCell>
-            <TableCell align="right">Unit</TableCell>
+            <TableCell>Navn</TableCell>
+            <TableCell align="right">Kvantitet</TableCell>
+            <TableCell align="right">Enhet</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
