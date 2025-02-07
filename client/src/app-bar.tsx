@@ -30,7 +30,7 @@ export const MiddagAppBar = () => {
           <Link to="/list">
             <LinkButton title="Handleliste" />
           </Link>
-          <Link to="/list">
+          <Link to="/planner">
             <LinkButton title="Planlegger" />
           </Link>
         </Toolbar>

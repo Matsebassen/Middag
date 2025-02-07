@@ -38,6 +38,19 @@ export const useGetIngredientTypes = () => {
   return { ...query, ingredientTypes: query.data };
 };
 
+export const useAddToShoppingList = (categoryId: number) => {
+  const query = useMutation({
+    mutationFn: (name: string) =>
+      axios
+        .post<ShopItem>(
+          `${API}/ShopItems/${categoryId}/${encodeURIComponent(name)}`
+        )
+        .then((res) => res.data)
+  });
+
+  return { ...query, addToShoppingList: query.mutateAsync };
+};
+
 export const useSetIngredientType = (categoryId: number) => {
   const queryClient = useQueryClient();
 

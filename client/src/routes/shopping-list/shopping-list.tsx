@@ -18,6 +18,7 @@ import React, {
 } from "react";
 import {
   SHOP_ITEMS_QUERY_KEY,
+  useAddToShoppingList,
   useFetchShopItems,
   useGetIngredientTypes,
   useSetIngredientType
@@ -26,11 +27,7 @@ import { useSignalR } from "../../hooks/useSignalR";
 import { ShopItem } from "../../models/shopItem";
 import { ShoppingCategories } from "./shopping-categories";
 import { ShoppingItem } from "./shopping-item";
-import {
-  addIngredient,
-  editIngredient,
-  toggleShopItem
-} from "./shopping-list-service";
+import { editIngredient, toggleShopItem } from "./shopping-list-service";
 import { PageHeader } from "../../components/page-header";
 
 export const ShoppingList = () => {
@@ -63,6 +60,7 @@ const ShoppingListInternal = () => {
 
   const { ingredientTypes } = useGetIngredientTypes();
   const { setIngredientType } = useSetIngredientType(category);
+  const { addToShoppingList } = useAddToShoppingList(category);
 
   const menuOpen = Boolean(shopItemMenu);
 
@@ -79,7 +77,7 @@ const ShoppingListInternal = () => {
   ) => {
     if (event.key === "Enter") {
       setLoading(true);
-      const shopItem = await addIngredient(ingredientInput, category);
+      const shopItem = await addToShoppingList(ingredientInput);
       mutateShopItemAdd(shopItem);
       setIngredientInput("");
       setLoading(false);

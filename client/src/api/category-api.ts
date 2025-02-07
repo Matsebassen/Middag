@@ -58,10 +58,11 @@ export const useAddCategory = () => {
   const queryClient = useQueryClient();
 
   const query = useMutation({
-    mutationFn: (categoryName: string) =>
-      axios
-        .post<NameId>(`${API}/category`, { name: categoryName })
-        .then((res) => res.data),
+    mutationFn: (categoryName: string) => {
+      return axios
+        .post<NameId>(`${API}/category/${encodeURIComponent(categoryName)}`)
+        .then((res) => res.data);
+    },
     onSuccess: (category: NameId) =>
       queryClient.setQueryData(
         ["categories"],

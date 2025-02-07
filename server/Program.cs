@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiddagApi.Models;
 using Microsoft.Extensions.Configuration;
 using MiddagApi.Controllers;
+using MiddagApi.Services;
 
 
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -31,6 +32,10 @@ builder.Services.AddDbContext<DinnerContext>(opt =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IShopItemsService, ShopItemsService>();
+builder.Services.AddScoped<IDinnerService, DinnerService>();
+
 
 var app = builder.Build();
 

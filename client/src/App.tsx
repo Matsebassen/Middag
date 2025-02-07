@@ -7,6 +7,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AddDinner from "./routes/add-dinner/add-dinner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SearchDinner } from "./routes/search-dinner/search-dinner";
+import Planner from "./routes/planner";
 
 const theme = createTheme({
   palette: {
@@ -45,6 +46,7 @@ function App() {
               <Route path="/list" element={<ShoppingList />} />
               <Route path="/search" element={<SearchDinner />} />
               <Route path="/add" element={<AddDinner />} />
+              <Route path="/planner" element={<Planner />} />
             </Routes>
           </div>
         </QueryClientProvider>

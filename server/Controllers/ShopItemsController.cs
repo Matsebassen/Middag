@@ -8,66 +8,43 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MiddagApi.Models;
+using MiddagApi.Services;
 
 namespace MiddagApi.Controllers
 {
     [Route("api/ShopItems")]
     [ApiController]
-    public class ShopItemsController : ControllerBase
+    public class ShopItemsController(IShopItemsService shopItemsService) : ControllerBase
     {
-        private readonly IHubContext<NotificationHub> _hubContext;
-        private readonly DinnerContext _context;
-
-        public ShopItemsController(DinnerContext context, IHubContext<NotificationHub> hubContext)
-        {
-            _context = context;
-            _hubContext = hubContext;
-        }
-
         // GET: api/ShopItems
         [HttpGet("{categoryId}")]
         public async Task<ActionResult<IEnumerable<ShopItemResponse>>> GetShopItems(long categoryId)
         {
-            var shopItems= await _context.ShopItems.Include(item => item.Category)
-              .Include(item => item.Ingredient)
-              .ThenInclude(ingredient => ingredient.ingredientType)
-              .Where(item => item.Category != null && item.Category.ID == categoryId)
-              .ToListAsync();
-
-            var shopItemsDto = shopItems.Adapt<List<ShopItemResponse>>();
-            return Ok(shopItemsDto);
+            var shopItems = await shopItemsService.GetShopItemsAsync(categoryId);   
+            return Ok(shopItems.Adapt<List<ShopItemResponse>>());
         }
 
         // GET: api/ShopItems/ingredientTypes
         [HttpGet("ingredientTypes")]
         public async Task<ActionResult<IEnumerable<IngredientType>>> GetIngredientTypes()
         {
-            return await _context.IngredientTypes.OrderBy(i => i.order)
-              .ToListAsync();
+            var ingredientTypes = await shopItemsService.GetIngredientTypesAsync();
+            return Ok(ingredientTypes);
         }
 
 
 
         // GET: api/ShopItems/setIngredientType
         [HttpPatch("setIngredientType/{ingredientId}/{ingredientTypeId}")]
-        public async Task<ActionResult<IngredientItem>> SetIngredientType(long ingredientId, long ingredientTypeId)
+        public async Task<ActionResult<IngredientItemResponse>> SetIngredientType(long ingredientId, long ingredientTypeId)
         {
 
-            var ingredientItem = await _context.IngredientItem.FindAsync(ingredientId);
-            if (ingredientItem == null)
+            var ingredientItem = await shopItemsService.UpdateIngredientTypeAsync(ingredientId, ingredientTypeId);
+            if (ingredientItem is null)
             {
-                return NotFound("Ingredient not found");
+                return NotFound("Ingredient or ingredientType not found");
             }
-            var ingredientType = await _context.IngredientTypes.FindAsync(ingredientTypeId);
-
-            if (ingredientType == null)
-            {
-                return NotFound("Ingredient type not found");
-            }
-            ingredientItem.ingredientType = ingredientType;
-            await _context.SaveChangesAsync();
             var response = ingredientItem.Adapt<IngredientItemResponse>();
-
             return Ok(response);
         }
 
@@ -80,24 +57,13 @@ namespace MiddagApi.Controllers
             {
                 return BadRequest();
             }
-
-            var shopItem = await _context.ShopItems
-                .Include(s => s.Ingredient)
-                .ThenInclude(i => i.ingredientType)
-                .FirstOrDefaultAsync(s => s.ID == id);
-            
-            if (shopItem == null)
+            var shopItem = await shopItemsService.UpdateShopItemAsync(id, item);
+            if (shopItem is null)
             {
                 return NotFound("ShopItem not found");
             }
-            shopItem.Description = item.Description;
-            shopItem.RecentlyUsed = item.RecentlyUsed;
             
-            await _context.SaveChangesAsync();
-
-            var response = shopItem.Adapt<ShopItemResponse>();
-            await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
-            return Ok(response);
+            return Ok(shopItem);
         }
 
         // PATCH: api/ShopItems/toggle/5
@@ -105,165 +71,48 @@ namespace MiddagApi.Controllers
         [HttpPatch("toggle/{id}")]
         public async Task<ActionResult<ShopItemResponse>> ToggleShopItem(long id)
         {
-            var shopItem = await _context.ShopItems
-              .Include(item => item.Ingredient)
-              .Include(item => item.Category)
-              .SingleOrDefaultAsync(i => i.ID == id);
-            if (shopItem == null)
+            var shopItem = await shopItemsService.ToggleShopItemAsync(id);
+            if (shopItem is null)
             {
-                return NotFound();
+                return NotFound("ShopItem not found");
             }
-
-            if (shopItem.RecentlyUsed > 0)
-            {
-                shopItem.RecentlyUsed = 0;
-            }
-            else
-            {
-                // Find next number for recentlyUsed
-                var maxRecentlyUsed = await _context.ShopItems
-                  .MaxAsync(s => s.RecentlyUsed);
-                var nextRecentlyUsed = maxRecentlyUsed > 0 ? maxRecentlyUsed + 1 : 1;
-                shopItem.RecentlyUsed = nextRecentlyUsed;
-                var shopItemCategory = shopItem.Category;
-                
-                
-                // Delete the older recent item if more than 10 recent items exist
-                var recentItems = await _context.ShopItems
-                    .Where(s => s.Category == shopItemCategory || s.Category == null)
-                    .Where(s => s.RecentlyUsed > 0)
-                    .OrderBy(s => -s.RecentlyUsed) // Order by RecentlyUsed ascending
-                    .ToListAsync();
-
-                if (recentItems.Count > 9)
-                {
-                    var itemsToDelete = recentItems.Skip(9); // Skip the first 9 items
-                    _context.ShopItems.RemoveRange(itemsToDelete); // Remove the rest
-                }
-
-            }
-            await _context.SaveChangesAsync();
-            var response = shopItem.Adapt<ShopItemResponse>();
-            await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
-            return Ok(response);
+            return Ok(shopItem);
         }
 
         // POST: api/ShopItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<ShopItemResponse>> PostShopItem(ShopItemResponse item)
+        [HttpPost("{categoryId}/{name}")]
+        public async Task<ActionResult<ShopItemResponse>> PostShopItem(long categoryId, string name)
         {
-            if (item.IngredientItem.Name == null)
-            {
-                return BadRequest("Name cannot be empty");
-            }
-            
-            var shopItem = await AddIngredientToList(item.IngredientItem.Name, item.CategoryId);
-            await _context.SaveChangesAsync();
-            var response = shopItem.Adapt<ShopItemResponse>();
-            await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
+            var response = await shopItemsService.CreateShopItemAsync(categoryId, name);
             return CreatedAtAction("PostShopItem", new { id = response.ID }, response);
         }
 
-        private async Task<ShopItem> AddIngredientToList(string shopItemName, long? categoryId)
-        {
-            var existingShopItem = await _context.ShopItems
-            .Include(s => s.Ingredient)
-            .Include(s => s.Category)
-            .SingleOrDefaultAsync(si => si.Ingredient.Name.Equals(shopItemName) && si.Category.ID == categoryId);
-            if (existingShopItem != null)
-            {
-                // Already exists in shopping list
-                if (existingShopItem.RecentlyUsed > 0)
-                {
-                    // It's in recently used section only. So revert to the "to buy" list and reset desc
-                    existingShopItem.RecentlyUsed = 0;
-                    existingShopItem.Description = "";
-                }
-                else
-                {
-                    // Add a + to the description if it already exists
-                    existingShopItem.Description += " +";
-                }
-                return existingShopItem;
-            }
-            else
-            {
-                // new ingredient to shopping list
-                var shopItem = new ShopItem();
-                var ingredientItem = await _context.IngredientItem
-                  .FirstOrDefaultAsync(i => i.Name == shopItemName);
-                if (ingredientItem != null)
-                {
-                    shopItem.Ingredient = ingredientItem;
-                }
-                else
-                {
-                    shopItem.Ingredient = new IngredientItem();
-                    shopItem.Ingredient.Name = shopItemName;
-                }
-                shopItem.RecentlyUsed = 0;
-                shopItem.Description = "";
-                shopItem.Category = await _context.ShopCategories.FindAsync(categoryId);
-                _context.ShopItems.Add(shopItem);
-                return shopItem;
-            }
-        }
-
+        
         // POST: api/ShopItems/addDinner/5
         [HttpPost("addDinner/{id}")]
-        public async Task<IActionResult> AddDinnerToList(long id)
+        public async Task<ActionResult<string>> AddDinnerToList(long id)
         {
-            if (_context.ShopItems == null)
+            var dinnerName = await shopItemsService.AddDinnerToListAsync(id);
+            if (dinnerName is null)
             {
-                return NotFound();
-            }
-            var dinnerItem = await _context.DinnerItems
-              .AsNoTracking()
-              .Include(d => d.Ingredients)
-              .ThenInclude(ri => ri.Ingredient)
-              .FirstOrDefaultAsync(d => d.ID == id);
-
-            if (dinnerItem == null || dinnerItem.Ingredients == null)
-            {
-                return NotFound();
-            }
-            foreach (var recipeItem in dinnerItem.Ingredients)
-            {
-                if (recipeItem.Ingredient != null && recipeItem.Ingredient.Name != null)
-                {
-                    await AddIngredientToList(recipeItem.Ingredient.Name, 1);
-                }
+                return NotFound("Dinner not found");
             }
 
-            await _context.SaveChangesAsync();
-
-            return Ok(dinnerItem.Name + " - added!");
+            return Ok(dinnerName + " - added!");
         }
 
         // DELETE: api/ShopItems/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShopItem(long id)
         {
-            if (_context.ShopItems == null)
-            {
-                return NotFound();
-            }
-            var shopItem = await _context.ShopItems.FindAsync(id);
-            if (shopItem == null)
-            {
-                return NotFound();
-            }
 
-            _context.ShopItems.Remove(shopItem);
-            await _context.SaveChangesAsync();
-
+            var response = await shopItemsService.DeleteShopItemAsync(id);
+            if (!response)
+            {
+                return NotFound("ShopItem not found");
+            }
             return NoContent();
-        }
-
-        private bool ShopItemExists(long id)
-        {
-            return (_context.ShopItems?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
