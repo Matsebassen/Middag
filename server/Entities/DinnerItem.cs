@@ -2,7 +2,7 @@ namespace MiddagApi.Models
 {
     public class DinnerItem
     {
-        public long ID { get; set; }
+        public string ID { get; set; }
         public string Name { get; set; }
         public string? PicUrl { get; set;}
         public string? Portions { get; set;}

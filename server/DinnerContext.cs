@@ -21,7 +21,19 @@ namespace MiddagApi.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DinnerItem>().ToTable("Dinners");
+            // Define a separate container for each entity
+            modelBuilder.Entity<ShopItem>().ToContainer("ShopItems").HasNoDiscriminator();
+            modelBuilder.Entity<DinnerItem>().ToContainer("Dinners").HasNoDiscriminator();
+            modelBuilder.Entity<IngredientItem>().ToContainer("Ingredients").HasNoDiscriminator();
+            modelBuilder.Entity<IngredientType>().ToContainer("IngredientTypes").HasNoDiscriminator();
+            modelBuilder.Entity<ShopCategory>().ToContainer("ShopCategory").HasNoDiscriminator();
+
+            // Set partition keys (important for performance)
+            modelBuilder.Entity<ShopItem>().HasPartitionKey(x => x.categoryId);
+            modelBuilder.Entity<DinnerItem>().HasPartitionKey(x => x.ID);
+            modelBuilder.Entity<IngredientItem>().HasPartitionKey(x => x.id);
+            modelBuilder.Entity<IngredientType>().HasPartitionKey(x => x.id);
+            modelBuilder.Entity<ShopCategory>().HasPartitionKey(x => x.id);
         }
 
     }

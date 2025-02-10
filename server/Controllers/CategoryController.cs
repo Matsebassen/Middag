@@ -28,14 +28,14 @@ namespace MiddagApi.Controllers
             }
             
             var category = await categoryService.CreateCategoryAsync(categoryName);
-            return CreatedAtAction("PostCategory", new { id = category.ID }, category);
+            return CreatedAtAction("PostCategory", new { id = category.id }, category);
         }
 
         // DELETE: api/category
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(long id)
+        public async Task<IActionResult> DeleteCategory(string id)
         {
-            if (id == 1)
+            if (id == "1")
             {
                 return BadRequest("Not allowed to delete the default category");
             }

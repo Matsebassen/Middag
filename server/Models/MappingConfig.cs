@@ -6,9 +6,10 @@ public class MappingConfig
 {
     public static void ConfigureMappings()
     {
+        /*
         TypeAdapterConfig<IngredientItem, IngredientItemResponse>.NewConfig()
             .Map(dest => dest.Order, src => src.ingredientType != null ? src.ingredientType.order : 99)
-            .Map(dest => dest.IngredientTypeId, src => src.ingredientType != null ? src.ingredientType.ID : 0);
+            .Map(dest => dest.IngredientTypeId, src => src.ingredientType != null ? src.ingredientType.id : '0');
             
         TypeAdapterConfig<ShopItem, ShopItemResponse>.NewConfig()
             .Map(dest => dest.CategoryId, src => src.Category != null ? src.Category.ID : null)
@@ -20,6 +21,6 @@ public class MappingConfig
             .Map(dest => dest.Ingredient.ID, src => src.IngredientItem.ID  )
             .Map(dest => dest.Ingredient.ingredientType.order, src => (src.IngredientItem.Order != null) ? src.IngredientItem.Order : 99 )
             .Map(dest => dest.Ingredient.ingredientType.ID, src => (src.IngredientItem.IngredientTypeId != null ) ? src.IngredientItem.IngredientTypeId : 0 );
-        
+        */
     }
 }

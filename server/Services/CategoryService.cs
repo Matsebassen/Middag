@@ -18,19 +18,21 @@ public class CategoryService(DinnerContext context) : ICategoryService
         return entry.Entity;
     }
 
-    public async Task<bool> DeleteCategoryAsync(long id)
+    public async Task<bool> DeleteCategoryAsync(string id)
     {
         var category = await context.ShopCategories.FindAsync(id);
         if (category == null)
         {
             return false;
         }
-            
-        var shopItemsWithCategory =  context.ShopItems.Where(shopItem => shopItem.Category != null && shopItem.Category.ID == id);
+        
+        /*
+        var shopItemsWithCategory =  context.ShopItems.Where(shopItem => shopItem.categoryId == id);
         foreach (var shopItem in shopItemsWithCategory)
         {
-            shopItem.Category = null;
+            //shopItem.Category = null;
         }
+        */
 
         context.Remove(category);
 
@@ -40,7 +42,7 @@ public class CategoryService(DinnerContext context) : ICategoryService
 
     public async Task<ShopCategory?> UpdateCategoryAsync(ShopCategory category)
     {
-        var foundCategory = await context.ShopCategories.FindAsync(category.ID);
+        var foundCategory = await context.ShopCategories.FindAsync(category.id);
         if (foundCategory is null)
         {
             return null;

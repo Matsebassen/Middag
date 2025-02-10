@@ -16,7 +16,7 @@ public class DinnerService(DinnerContext context) : IDinnerService
         return dinners;
     }
 
-    public async Task<DinnerItem?> GetDinnerAsync(long id)
+    public async Task<DinnerItem?> GetDinnerAsync(string id)
     {
         var dinner = await context.DinnerItems
             .Include(d => d.Ingredients)
@@ -125,7 +125,7 @@ public class DinnerService(DinnerContext context) : IDinnerService
         return dinner.Entity;
     }
 
-    public async Task<bool> DeleteDinnerAsync(long id)
+    public async Task<bool> DeleteDinnerAsync(string id)
     {
         var dinnerItem = await context.DinnerItems.FindAsync(id);
         if (dinnerItem == null)

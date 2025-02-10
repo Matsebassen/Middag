@@ -8,12 +8,10 @@ namespace MiddagApi.Services;
 
 public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub> _hubContext) : IShopItemsService
 {
-    public async Task<IEnumerable<ShopItem>> GetShopItemsAsync(long categoryId)
+    public async Task<IEnumerable<ShopItem>> GetShopItemsAsync(string categoryId)
     {
-        var shopItems= await context.ShopItems.Include(item => item.Category)
-            .Include(item => item.Ingredient)
-            .ThenInclude(ingredient => ingredient.ingredientType)
-            .Where(item => item.Category != null && item.Category.ID == categoryId)
+        var shopItems= await context.ShopItems
+            .Where(item => item.categoryId == categoryId)
             .ToListAsync();
         return shopItems;
     }
@@ -24,7 +22,7 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
             .ToListAsync();
     }
 
-    public async Task<IngredientItem?> UpdateIngredientTypeAsync(long ingredientId, long ingredientTypeId)
+    public async Task<IngredientItem?> UpdateIngredientTypeAsync(string ingredientId, string ingredientTypeId)
     {
         var ingredientItem = await context.IngredientItem.FindAsync(ingredientId);
         if (ingredientItem == null)
@@ -42,59 +40,53 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
         return ingredientItem;
     }
 
-    public async Task<ShopItemResponse?> UpdateShopItemAsync(long id, ShopItemResponse item)
+    public async Task<ShopItem?> UpdateShopItemAsync(string id, ShopItem item)
     {
         var shopItem = await context.ShopItems
-            .Include(s => s.Ingredient)
-            .ThenInclude(i => i.ingredientType)
-            .FirstOrDefaultAsync(s => s.ID == id);
+            .FirstOrDefaultAsync(s => s.id == id);
             
         if (shopItem is null)
         {
             return null;
         }
-        shopItem.Description = item.Description;
-        shopItem.RecentlyUsed = item.RecentlyUsed;
+        shopItem.description = item.description;
+        shopItem.recentlyUsed = item.recentlyUsed;
             
         await context.SaveChangesAsync();
-        var response = shopItem.Adapt<ShopItemResponse>();
-        await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
+        //var response = shopItem.Adapt<ShopItemResponse>();
+        await _hubContext.Clients.All.SendAsync("ToggleShopItem", shopItem);
 
-        return response;
+        return shopItem;
     }
 
-    public async Task<ShopItemResponse?> ToggleShopItemAsync(long id)
+    public async Task<ShopItem?> ToggleShopItemAsync(string id)
     {
         var shopItem = await context.ShopItems
-            .Include(item => item.Category)
-            .Include(item => item.Ingredient)
-            .ThenInclude(i => i.ingredientType)
-            .SingleOrDefaultAsync(i => i.ID == id);
+            .SingleOrDefaultAsync(i => i.id == id);
         
         if (shopItem == null)
         {
             return null;
         }
 
-        if (shopItem.RecentlyUsed > 0)
+        if (shopItem.recentlyUsed > 0)
         {
-            shopItem.RecentlyUsed = 0;
+            shopItem.recentlyUsed = 0;
         }
         else
         {
             // Find next number for recentlyUsed
             var maxRecentlyUsed = await context.ShopItems
-                .MaxAsync(s => s.RecentlyUsed);
+                .MaxAsync(s => s.recentlyUsed);
             var nextRecentlyUsed = maxRecentlyUsed > 0 ? maxRecentlyUsed + 1 : 1;
-            shopItem.RecentlyUsed = nextRecentlyUsed;
-            var shopItemCategory = shopItem.Category;
+            shopItem.recentlyUsed = nextRecentlyUsed;
                 
                 
             // Delete the older recent item if more than 10 recent items exist
             var recentItems = await context.ShopItems
-                .Where(s => s.Category == shopItemCategory || s.Category == null)
-                .Where(s => s.RecentlyUsed > 0)
-                .OrderBy(s => -s.RecentlyUsed) // Order by RecentlyUsed ascending
+                .Where(s => s.categoryId == shopItem.categoryId)
+                .Where(s => s.recentlyUsed > 0)
+                .OrderBy(s => -s.recentlyUsed) // Order by RecentlyUsed ascending
                 .ToListAsync();
 
             if (recentItems.Count > 9)
@@ -105,21 +97,20 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
 
         }
         await context.SaveChangesAsync();
-        var response = shopItem.Adapt<ShopItemResponse>();
-        await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
-        return response;
+        await _hubContext.Clients.All.SendAsync("ToggleShopItem", shopItem);
+        return shopItem;
     }
 
-    public async Task<ShopItemResponse?> CreateShopItemAsync(long categoryId, string name)
+    public async Task<ShopItem?> CreateShopItemAsync(string categoryId, string name)
     {
         var shopItem = await AddIngredientToList(name, categoryId);
         await context.SaveChangesAsync();
-        var response = shopItem.Adapt<ShopItemResponse>();
-        await _hubContext.Clients.All.SendAsync("ToggleShopItem", response);
-        return response;
+        //var response = shopItem.Adapt<ShopItemResponse>();
+        await _hubContext.Clients.All.SendAsync("ToggleShopItem", shopItem);
+        return shopItem;
     }
 
-    public async Task<string?> AddDinnerToListAsync(long dinnerId)
+    public async Task<string?> AddDinnerToListAsync(string dinnerId)
     {
         var dinnerItem = await context.DinnerItems
             .AsNoTracking()
@@ -135,7 +126,7 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
         {
             if (recipeItem.Ingredient != null && recipeItem.Ingredient.Name != null)
             {
-                await AddIngredientToList(recipeItem.Ingredient.Name, 1);
+                await AddIngredientToList(recipeItem.Ingredient.Name, "1");
             }
         }
 
@@ -143,7 +134,7 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
         return dinnerItem.Name;
     }
 
-    public async Task<bool> DeleteShopItemAsync(long id)
+    public async Task<bool> DeleteShopItemAsync(string id)
     {
         var shopItem = await context.ShopItems.FindAsync(id);
         if (shopItem == null)
@@ -156,27 +147,24 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
         return true;
     }
     
-    private async Task<ShopItem> AddIngredientToList(string shopItemName, long? categoryId)
+    private async Task<ShopItem> AddIngredientToList(string shopItemName, string? categoryId)
     {
         var existingShopItem = await context.ShopItems
-            .Include(s => s.Category)
-            .Include(s => s.Ingredient)
-            .ThenInclude(i => i.ingredientType)
-            .SingleOrDefaultAsync(si => si.Ingredient.Name.Equals(shopItemName) && si.Category.ID == categoryId);
+            .SingleOrDefaultAsync(si => si.name.Equals(shopItemName) && si.categoryId == categoryId);
         
         if (existingShopItem != null)
         {
             // Already exists in shopping list
-            if (existingShopItem.RecentlyUsed > 0)
+            if (existingShopItem.recentlyUsed > 0)
             {
                 // It's in recently used section only. So revert to the "to buy" list and reset desc
-                existingShopItem.RecentlyUsed = 0;
-                existingShopItem.Description = "";
+                existingShopItem.recentlyUsed = 0;
+                existingShopItem.description = "";
             }
             else
             {
                 // Add a + to the description if it already exists
-                existingShopItem.Description += " +";
+                existingShopItem.description += " +";
             }
             return existingShopItem;
         } else
@@ -187,16 +175,17 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
                 .FirstOrDefaultAsync(i => i.Name == shopItemName);
             if (ingredientItem != null)
             {
-                shopItem.Ingredient = ingredientItem;
+                shopItem.name = ingredientItem.Name;
             }
             else
             {
-                shopItem.Ingredient = new IngredientItem();
-                shopItem.Ingredient.Name = shopItemName;
+                // TODO: Fix new ingredient item
+                //shopItem.Ingredient = new IngredientItem();
+                shopItem.name = shopItemName;
             }
-            shopItem.RecentlyUsed = 0;
-            shopItem.Description = "";
-            shopItem.Category = await context.ShopCategories.FindAsync(categoryId);
+            shopItem.recentlyUsed = 0;
+            shopItem.description = "";
+            shopItem.categoryId = categoryId ?? "1"; //await context.ShopCategories.FindAsync(categoryId);
             context.ShopItems.Add(shopItem);
             return shopItem;
         }

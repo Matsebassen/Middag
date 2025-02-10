@@ -18,10 +18,10 @@ namespace MiddagApi.Controllers
     {
         // GET: api/ShopItems
         [HttpGet("{categoryId}")]
-        public async Task<ActionResult<IEnumerable<ShopItemResponse>>> GetShopItems(long categoryId)
+        public async Task<ActionResult<IEnumerable<ShopItem>>> GetShopItems(string categoryId)
         {
             var shopItems = await shopItemsService.GetShopItemsAsync(categoryId);   
-            return Ok(shopItems.Adapt<List<ShopItemResponse>>());
+            return Ok(shopItems);
         }
 
         // GET: api/ShopItems/ingredientTypes
@@ -36,7 +36,7 @@ namespace MiddagApi.Controllers
 
         // GET: api/ShopItems/setIngredientType
         [HttpPatch("setIngredientType/{ingredientId}/{ingredientTypeId}")]
-        public async Task<ActionResult<IngredientItemResponse>> SetIngredientType(long ingredientId, long ingredientTypeId)
+        public async Task<ActionResult<IngredientItemResponse>> SetIngredientType(string ingredientId, string ingredientTypeId)
         {
 
             var ingredientItem = await shopItemsService.UpdateIngredientTypeAsync(ingredientId, ingredientTypeId);
@@ -51,9 +51,9 @@ namespace MiddagApi.Controllers
         // PUT: api/ShopItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult<ShopItemResponse>> PutShopItem(long id, ShopItemResponse item)
+        public async Task<ActionResult<ShopItemResponse>> PutShopItem(string id, ShopItem item)
         {
-            if (id != item.ID)
+            if (id != item.id)
             {
                 return BadRequest();
             }
@@ -69,7 +69,7 @@ namespace MiddagApi.Controllers
         // PATCH: api/ShopItems/toggle/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("toggle/{id}")]
-        public async Task<ActionResult<ShopItemResponse>> ToggleShopItem(long id)
+        public async Task<ActionResult<ShopItemResponse>> ToggleShopItem(string id)
         {
             var shopItem = await shopItemsService.ToggleShopItemAsync(id);
             if (shopItem is null)
@@ -82,16 +82,16 @@ namespace MiddagApi.Controllers
         // POST: api/ShopItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("{categoryId}/{name}")]
-        public async Task<ActionResult<ShopItemResponse>> PostShopItem(long categoryId, string name)
+        public async Task<ActionResult<ShopItemResponse>> PostShopItem(string categoryId, string name)
         {
             var response = await shopItemsService.CreateShopItemAsync(categoryId, name);
-            return CreatedAtAction("PostShopItem", new { id = response.ID }, response);
+            return CreatedAtAction("PostShopItem", new { id = response.id }, response);
         }
 
         
         // POST: api/ShopItems/addDinner/5
         [HttpPost("addDinner/{id}")]
-        public async Task<ActionResult<string>> AddDinnerToList(long id)
+        public async Task<ActionResult<string>> AddDinnerToList(string id)
         {
             var dinnerName = await shopItemsService.AddDinnerToListAsync(id);
             if (dinnerName is null)
@@ -104,7 +104,7 @@ namespace MiddagApi.Controllers
 
         // DELETE: api/ShopItems/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteShopItem(long id)
+        public async Task<IActionResult> DeleteShopItem(string id)
         {
 
             var response = await shopItemsService.DeleteShopItemAsync(id);

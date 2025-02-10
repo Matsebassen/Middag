@@ -20,7 +20,7 @@ namespace MiddagApi.Controllers
 
         // GET: api/DinnerItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DinnerItem>> GetDinnerItem(long id)
+        public async Task<ActionResult<DinnerItem>> GetDinnerItem(string id)
         {
             var dinnerItem = await dinnerService.GetDinnerAsync(id);
 
@@ -50,7 +50,7 @@ namespace MiddagApi.Controllers
         // PUT: api/DinnerItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<ActionResult<DinnerItem>> PutDinnerItem(long id, DinnerItem dinnerItem)
+        public async Task<ActionResult<DinnerItem>> PutDinnerItem(string id, DinnerItem dinnerItem)
         {
             if (id != dinnerItem.ID)
             {
@@ -80,7 +80,7 @@ namespace MiddagApi.Controllers
 
         // DELETE: api/DinnerItems/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDinnerItem(long id)
+        public async Task<IActionResult> DeleteDinnerItem(string id)
         {
             var result = await dinnerService.DeleteDinnerAsync(id);
             if (!result)
