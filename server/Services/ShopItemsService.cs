@@ -184,6 +184,7 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
             // new ingredient to shopping list
             var shopItem = new ShopItem();
             var ingredientItem = await context.IngredientItem
+                .Include(i => i.ingredientType)
                 .FirstOrDefaultAsync(i => i.Name == shopItemName);
             if (ingredientItem != null)
             {
