@@ -13,7 +13,6 @@ namespace MiddagApi.Models
         public DbSet<DinnerItem> DinnerItems { get; set; } = null!;
         public DbSet<ShopItem> ShopItems { get; set; } = null!;
         public DbSet<IngredientItem> IngredientItem { get; set; } = null!;
-        public DbSet<RecipeItem> RecipeItem { get; set; } = null!;
         public DbSet<IngredientType> IngredientTypes { get; set; } = null!;
         public DbSet<ShopCategory> ShopCategories { get; set; } = null!;
 
@@ -29,8 +28,8 @@ namespace MiddagApi.Models
             modelBuilder.Entity<ShopCategory>().ToContainer("ShopCategory").HasNoDiscriminator();
 
             // Set partition keys (important for performance)
-            modelBuilder.Entity<ShopItem>().HasPartitionKey(x => x.categoryId);
-            modelBuilder.Entity<DinnerItem>().HasPartitionKey(x => x.ID);
+            modelBuilder.Entity<ShopItem>().HasPartitionKey(x => x.id);
+            modelBuilder.Entity<DinnerItem>().HasPartitionKey(x => x.id);
             modelBuilder.Entity<IngredientItem>().HasPartitionKey(x => x.id);
             modelBuilder.Entity<IngredientType>().HasPartitionKey(x => x.id);
             modelBuilder.Entity<ShopCategory>().HasPartitionKey(x => x.id);

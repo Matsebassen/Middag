@@ -137,7 +137,7 @@ const IngredientsTable = (props: { ingredients: RecipeItem[] }) => {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {recipeItem.ingredient.name}
+                {recipeItem.name}
               </TableCell>
               <TableCell align="right">{recipeItem.qty}</TableCell>
               <TableCell align="right">{recipeItem.unit}</TableCell>

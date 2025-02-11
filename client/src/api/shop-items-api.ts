@@ -12,7 +12,7 @@ import { IngredientItem } from "../models/ingredient";
 
 export const SHOP_ITEMS_QUERY_KEY = "shopItems";
 
-export const useFetchShopItems = (categoryId: number) => {
+export const useFetchShopItems = (categoryId: string) => {
   const query = useSuspenseQuery({
     queryKey: [SHOP_ITEMS_QUERY_KEY, categoryId],
     //refetchInterval: 2000,
@@ -38,7 +38,7 @@ export const useGetIngredientTypes = () => {
   return { ...query, ingredientTypes: query.data };
 };
 
-export const useAddToShoppingList = (categoryId: number) => {
+export const useAddToShoppingList = (categoryId: string) => {
   const query = useMutation({
     mutationFn: (name: string) =>
       axios
@@ -51,7 +51,7 @@ export const useAddToShoppingList = (categoryId: number) => {
   return { ...query, addToShoppingList: query.mutateAsync };
 };
 
-export const useSetIngredientType = (categoryId: number) => {
+export const useSetIngredientType = (categoryId: string) => {
   const queryClient = useQueryClient();
 
   const query = useMutation({
@@ -59,8 +59,8 @@ export const useSetIngredientType = (categoryId: number) => {
       ingredientId,
       ingredientTypeId
     }: {
-      ingredientId?: number;
-      ingredientTypeId?: number;
+      ingredientId?: string;
+      ingredientTypeId?: string;
     }) =>
       axios
         .patch<IngredientItem>(
@@ -72,13 +72,11 @@ export const useSetIngredientType = (categoryId: number) => {
         [SHOP_ITEMS_QUERY_KEY, categoryId],
         (old: ShopItem[]) =>
           old.map((shopItem) => {
-            if (shopItem.ingredientItem.id === result.id) {
+            if (shopItem.ingredientId === result.id) {
               return {
                 ...shopItem,
-                ingredientItem: {
-                  ...shopItem.ingredientItem,
-                  ingredientTypeId: result.ingredientTypeId
-                }
+                ingredientTypeId: result.ingredientTypeId,
+                ingredientId: result.id
               };
             }
             return { ...shopItem };

@@ -1,4 +1,4 @@
 export type NameId = {
-    name: string;
-    id: number;
-}
+  name: string;
+  id: string;
+};

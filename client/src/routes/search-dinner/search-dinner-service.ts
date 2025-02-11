@@ -14,6 +14,6 @@ export const editDinner = (dinner: Dinner): Promise<Dinner> => {
     .then((res) => res.data);
 };
 
-export const addDinnerToShoppingList = (id: number): Promise<string> => {
+export const addDinnerToShoppingList = (id: string): Promise<string> => {
   return axios.post(`${API}/ShopItems/addDinner/${id}`).then((res) => res.data);
 };

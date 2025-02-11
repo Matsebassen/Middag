@@ -6,8 +6,8 @@ import { useFetchCategories } from "../../api/category-api";
 import { ShoppingCategoriesDialog } from "./shopping-categories-dialog";
 
 type ShoppingCategoriesProps = {
-  category: number;
-  setCategory: (category: number) => void;
+  category: string;
+  setCategory: (category: string) => void;
 };
 
 export const ShoppingCategories = ({
@@ -26,7 +26,7 @@ export const ShoppingCategories = ({
         aria-label="Category"
       >
         {categories
-          ?.sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
+          ?.sort((a, b) => a.id.localeCompare(b.id))
           .map((category) => (
             <Tab
               key={category.id}

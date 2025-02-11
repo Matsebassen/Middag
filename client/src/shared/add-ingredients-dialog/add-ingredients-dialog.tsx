@@ -31,7 +31,7 @@ const AddIngredientsDialog = (props: SimpleDialogProps) => {
         return {
           qty: itemArray[0],
           unit: itemArray[1] || "",
-          ingredient: { name: itemArray?.slice(2)?.join(" ") }
+          name: itemArray?.slice(2)?.join(" ")
         };
       });
     setRecipeItems("");

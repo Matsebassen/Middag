@@ -1,6 +1,7 @@
 using Mapster;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MiddagApi.Controllers;
 using MiddagApi.Models;
 
@@ -24,18 +25,27 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
 
     public async Task<IngredientItem?> UpdateIngredientTypeAsync(string ingredientId, string ingredientTypeId)
     {
-        var ingredientItem = await context.IngredientItem.FindAsync(ingredientId);
-        if (ingredientItem == null)
-        {
-            return null;
-        }
-        var ingredientType = await context.IngredientTypes.FindAsync(ingredientTypeId);
+        var ingredientType = await context.IngredientTypes.FirstOrDefaultAsync(type => type.id == ingredientTypeId);
 
         if (ingredientType == null)
         {
             return null;
         }
-        ingredientItem.ingredientType = ingredientType;
+        var ingredientItem = await context.IngredientItem.FirstOrDefaultAsync(i => i.id == ingredientId);
+        if (ingredientItem == null)
+        {
+            return null;
+        }
+        ingredientItem.ingredientTypeId = ingredientType.id;
+        ingredientItem.order = ingredientType.order;
+
+        var shopItems = await context.ShopItems.Where(si => si.ingredientId == ingredientId).ToListAsync();
+        foreach (var shopItem in shopItems)
+        {
+            shopItem.ingredientTypeId = ingredientType.id;
+            shopItem.order = ingredientType.order;
+        }
+        
         await context.SaveChangesAsync();
         return ingredientItem;
     }
@@ -53,7 +63,6 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
         shopItem.recentlyUsed = item.recentlyUsed;
             
         await context.SaveChangesAsync();
-        //var response = shopItem.Adapt<ShopItemResponse>();
         await _hubContext.Clients.All.SendAsync("ToggleShopItem", shopItem);
 
         return shopItem;
@@ -86,8 +95,8 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
             var recentItems = await context.ShopItems
                 .Where(s => s.categoryId == shopItem.categoryId)
                 .Where(s => s.recentlyUsed > 0)
-                .OrderBy(s => -s.recentlyUsed) // Order by RecentlyUsed ascending
                 .ToListAsync();
+            recentItems.Sort((a, b) => a.recentlyUsed < b.recentlyUsed ? 1 : -1);
 
             if (recentItems.Count > 9)
             {
@@ -105,38 +114,38 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
     {
         var shopItem = await AddIngredientToList(name, categoryId);
         await context.SaveChangesAsync();
-        //var response = shopItem.Adapt<ShopItemResponse>();
         await _hubContext.Clients.All.SendAsync("ToggleShopItem", shopItem);
         return shopItem;
     }
 
     public async Task<string?> AddDinnerToListAsync(string dinnerId)
     {
+        
         var dinnerItem = await context.DinnerItems
             .AsNoTracking()
-            .Include(d => d.Ingredients)
-            .ThenInclude(ri => ri.Ingredient)
-            .FirstOrDefaultAsync(d => d.ID == dinnerId);
+            .Include(d => d.ingredients)
+            .FirstOrDefaultAsync(d => d.id == dinnerId);
 
-        if (dinnerItem == null || dinnerItem.Ingredients == null)
+        if (dinnerItem == null || !dinnerItem.ingredients.Any())
         {
             return null;
         }
-        foreach (var recipeItem in dinnerItem.Ingredients)
+        foreach (var recipeItem in dinnerItem.ingredients)
         {
-            if (recipeItem.Ingredient != null && recipeItem.Ingredient.Name != null)
+            if ( recipeItem.name != null)
             {
-                await AddIngredientToList(recipeItem.Ingredient.Name, "1");
+                var shopItem = await AddIngredientToList(recipeItem.name, "1");
+                    shopItem.description += $" {recipeItem.qty}{recipeItem.unit}" ;
             }
         }
 
         await context.SaveChangesAsync();
-        return dinnerItem.Name;
+        return dinnerItem.name;
     }
 
     public async Task<bool> DeleteShopItemAsync(string id)
     {
-        var shopItem = await context.ShopItems.FindAsync(id);
+        var shopItem = await context.ShopItems.FirstOrDefaultAsync(s => s.id == id);
         if (shopItem == null)
         {
             return false;
@@ -150,7 +159,7 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
     private async Task<ShopItem> AddIngredientToList(string shopItemName, string? categoryId)
     {
         var existingShopItem = await context.ShopItems
-            .SingleOrDefaultAsync(si => si.name.Equals(shopItemName) && si.categoryId == categoryId);
+            .FirstOrDefaultAsync(si => si.name.ToUpper().Equals(shopItemName.ToUpper()) && si.categoryId == categoryId);
         
         if (existingShopItem != null)
         {
@@ -167,27 +176,33 @@ public class ShopItemsService(DinnerContext context, IHubContext<NotificationHub
                 existingShopItem.description += " +";
             }
             return existingShopItem;
-        } else
+        } 
+    
+        // new ingredient to shopping list
+        var shopItem = new ShopItem();
+        var ingredientItem = await context.IngredientItem
+            .FirstOrDefaultAsync(i => i.name.ToUpper() == shopItemName.ToUpper());
+        if (ingredientItem != null)
         {
-            // new ingredient to shopping list
-            var shopItem = new ShopItem();
-            var ingredientItem = await context.IngredientItem
-                .FirstOrDefaultAsync(i => i.Name == shopItemName);
-            if (ingredientItem != null)
-            {
-                shopItem.name = ingredientItem.Name;
-            }
-            else
-            {
-                // TODO: Fix new ingredient item
-                //shopItem.Ingredient = new IngredientItem();
-                shopItem.name = shopItemName;
-            }
-            shopItem.recentlyUsed = 0;
-            shopItem.description = "";
-            shopItem.categoryId = categoryId ?? "1"; //await context.ShopCategories.FindAsync(categoryId);
-            context.ShopItems.Add(shopItem);
-            return shopItem;
+            shopItem.name = ingredientItem.name;
+            shopItem.ingredientTypeId = ingredientItem.ingredientTypeId;
+            shopItem.ingredientId = ingredientItem.id;
+            shopItem.order = ingredientItem.order;
         }
+        else
+        {
+            var ingredient = context.IngredientItem
+                .Add(new IngredientItem { name = shopItemName, id = Guid.NewGuid().ToString() });
+            shopItem.name = shopItemName;
+            shopItem.ingredientId = ingredient.Entity.id;
+        }
+        shopItem.id = Guid.NewGuid().ToString();
+        shopItem.recentlyUsed = 0;
+        shopItem.description = "";
+        shopItem.categoryId = categoryId ?? "1";
+        context.ShopItems.Add(shopItem);
+        await context.SaveChangesAsync();
+        return shopItem;
+        
     }
 }

@@ -20,10 +20,10 @@ import {
 import { NameId } from "../../models/name-id";
 
 type ShoppingCategoriesDialogProps = {
-  currentCategory: number;
+  currentCategory: string;
   categories: NameId[];
   isOpen: boolean;
-  setCurrentCategory: (category: number) => void;
+  setCurrentCategory: (category: string) => void;
   onClose: () => void;
 };
 
@@ -38,13 +38,13 @@ export const ShoppingCategoriesDialog = ({
   const { deleteCategory } = useDeleteCategory();
   const { addCategory } = useAddCategory();
 
-  const [currentlyEditing, setCurrentlyEditing] = useState<number | undefined>(
+  const [currentlyEditing, setCurrentlyEditing] = useState<string | undefined>(
     undefined
   );
   const [categoryName, setCategoryName] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
 
-  const toggleEdit = (id: number | undefined) => {
+  const toggleEdit = (id: string | undefined) => {
     if (id === currentlyEditing) {
       if (!id) {
         addCategory(categoryName);
@@ -58,9 +58,9 @@ export const ShoppingCategoriesDialog = ({
     }
   };
 
-  const onDeleteCategory = async (id: number | undefined) => {
+  const onDeleteCategory = async (id: string | undefined) => {
     if (currentCategory === id) {
-      setCurrentCategory(1);
+      setCurrentCategory("1");
     }
     await deleteCategory(id);
   };
@@ -102,7 +102,7 @@ export const ShoppingCategoriesDialog = ({
                 </IconButton>
 
                 <IconButton
-                  disabled={category.id === 1}
+                  disabled={category.id === "1"}
                   onClick={() => onDeleteCategory(category.id)}
                   color="error"
                   className="shopping-list-categories__list-icon"

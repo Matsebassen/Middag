@@ -52,7 +52,7 @@ namespace MiddagApi.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<DinnerItem>> PutDinnerItem(string id, DinnerItem dinnerItem)
         {
-            if (id != dinnerItem.ID)
+            if (id != dinnerItem.id)
             {
                 return BadRequest();
             }
@@ -75,7 +75,7 @@ namespace MiddagApi.Controllers
             {
                 return BadRequest("Dinner not created");
             }
-            return CreatedAtAction(nameof(GetDinnerItem), new { id = dinnerItem.ID }, dinnerItem);
+            return CreatedAtAction(nameof(GetDinnerItem), new { id = dinnerItem.id }, dinnerItem);
         }
 
         // DELETE: api/DinnerItems/5

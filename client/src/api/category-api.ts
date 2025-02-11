@@ -39,7 +39,7 @@ export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
 
   const query = useMutation({
-    mutationFn: (categoryId: number | undefined) =>
+    mutationFn: (categoryId: string | undefined) =>
       axios
         .delete<void>(`${API}/category/${categoryId}`)
         .then(() => categoryId),

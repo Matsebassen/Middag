@@ -7,13 +7,13 @@ public class CategoryService(DinnerContext context) : ICategoryService
 {
     public async Task<IEnumerable<ShopCategory>> GetCategoriesAsync()
     {
-        return await context.ShopCategories.OrderBy(i => i.Name)
+        return await context.ShopCategories.OrderBy(i => i.name)
             .ToListAsync();
     }
 
     public async Task<ShopCategory> CreateCategoryAsync(string name)
     {
-        var entry = context.ShopCategories.Add(new ShopCategory { Name = name });
+        var entry = context.ShopCategories.Add(new ShopCategory { name = name, id = Guid.NewGuid().ToString()});
         await context.SaveChangesAsync();
         return entry.Entity;
     }
@@ -26,13 +26,13 @@ public class CategoryService(DinnerContext context) : ICategoryService
             return false;
         }
         
-        /*
-        var shopItemsWithCategory =  context.ShopItems.Where(shopItem => shopItem.categoryId == id);
+        
+        var shopItemsWithCategory =  await context.ShopItems.Where(shopItem => shopItem.categoryId == id).ToListAsync();
         foreach (var shopItem in shopItemsWithCategory)
         {
-            //shopItem.Category = null;
+            shopItem.categoryId = "1";
         }
-        */
+        
 
         context.Remove(category);
 
@@ -48,7 +48,7 @@ public class CategoryService(DinnerContext context) : ICategoryService
             return null;
         }
 
-        foundCategory.Name = category.Name;
+        foundCategory.name = category.name;
         await context.SaveChangesAsync();
         return foundCategory;
     }

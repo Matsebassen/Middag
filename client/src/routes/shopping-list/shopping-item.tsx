@@ -28,8 +28,8 @@ export const ShoppingItem = (props: {
   shopItem: ShopItem;
   isEditing: boolean;
   editIngredient: (ingredient: ShopItem) => void;
-  toggleHaveBought: (id: number) => void;
-  setEdit: (id: number) => void;
+  toggleHaveBought: (id: string) => void;
+  setEdit: (id: string) => void;
   openMenu: (
     event: React.MouseEvent<HTMLButtonElement>,
     shopItem: ShopItem
@@ -37,26 +37,26 @@ export const ShoppingItem = (props: {
 }) => {
   const theme = useTheme();
 
-  const getBackgroundImage = (id: number | undefined) => {
+  const getBackgroundImage = (id: string | undefined) => {
     if (!id) {
       return null;
     }
     switch (id) {
-      case 1:
+      case "1":
         return milk;
-      case 2:
+      case "2":
         return fish;
-      case 3:
+      case "3":
         return vegetables;
-      case 4:
+      case "4":
         return cans;
-      case 5:
+      case "5":
         return soap;
-      case 6:
+      case "6":
         return cheese;
-      case 7:
+      case "7":
         return baking;
-      case 8:
+      case "8":
         return chocolate;
     }
   };
@@ -67,12 +67,12 @@ export const ShoppingItem = (props: {
         props.shopItem.recentlyUsed > 0
           ? theme.palette.primary.main
           : theme.palette.secondary.main,
-      backgroundImage: `url(${getBackgroundImage(props.shopItem.ingredientItem.ingredientTypeId)})`
+      backgroundImage: `url(${getBackgroundImage(props.shopItem.ingredientTypeId)})`
     };
   };
 
   const spanStyle = {
-    fontSize: calculateFontSize(props.shopItem.ingredientItem.name)
+    fontSize: calculateFontSize(props.shopItem.name)
   };
 
   function onOpenMenu(event: React.MouseEvent<HTMLButtonElement>) {
@@ -94,9 +94,9 @@ export const ShoppingItem = (props: {
           <MoreVertIcon color="info" />
         </IconButton>
         <div className="shopping-item__heading">
-          {props.shopItem.ingredientItem.name?.substring(0, 1)?.toUpperCase()}
+          {props.shopItem.name?.substring(0, 1)?.toUpperCase()}
         </div>
-        <span style={spanStyle}>{props.shopItem.ingredientItem.name}</span>
+        <span style={spanStyle}>{props.shopItem.name}</span>
       </CardContent>
       <CardActions onClick={(e) => e.stopPropagation()}>
         <IngredientDescription
@@ -114,7 +114,7 @@ const IngredientDescription = (props: {
   ingredient: ShopItem;
   isEditing: boolean;
   editIngredient: (ingredient: ShopItem) => void;
-  setEdit: (id: number) => void;
+  setEdit: (id: string) => void;
 }) => {
   const [ingredientDesc, setIngredientDesc] = useState(
     props.ingredient.description

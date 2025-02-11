@@ -1,6 +1,5 @@
 export type IngredientItem = {
   name: string;
-  id?: number;
+  id?: string;
   ingredientTypeId?: number;
-  order?: number;
 };

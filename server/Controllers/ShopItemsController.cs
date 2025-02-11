@@ -44,8 +44,7 @@ namespace MiddagApi.Controllers
             {
                 return NotFound("Ingredient or ingredientType not found");
             }
-            var response = ingredientItem.Adapt<IngredientItemResponse>();
-            return Ok(response);
+            return Ok(ingredientItem);
         }
 
         // PUT: api/ShopItems/5
