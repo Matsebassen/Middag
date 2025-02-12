@@ -27,6 +27,7 @@ import baking from "../../assets/baking.png";
 export const ShoppingItem = (props: {
   shopItem: ShopItem;
   isEditing: boolean;
+  isRecentlyUpdated: boolean;
   editIngredient: (ingredient: ShopItem) => void;
   toggleHaveBought: (id: string) => void;
   setEdit: (id: string) => void;
@@ -85,7 +86,10 @@ export const ShoppingItem = (props: {
       className="shopping-item"
       onClick={() => props.toggleHaveBought(props.shopItem.id)}
     >
-      <CardContent sx={background} className="shopping-item__content">
+      <CardContent
+        sx={background}
+        className={`shopping-item__content ${props.isRecentlyUpdated && "animate-card"}`}
+      >
         <IconButton
           aria-label="settings"
           className="shopping-item__menu"

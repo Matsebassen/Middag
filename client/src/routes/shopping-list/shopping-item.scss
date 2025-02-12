@@ -1,8 +1,11 @@
-.shopping-item:hover{
-  box-shadow: 0 8px 12px 1px rgba(0,0,0,.14), 0 3px 15px -3px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12)
+.shopping-item:hover {
+  box-shadow:
+    0 8px 12px 1px rgba(0, 0, 0, 0.14),
+    0 3px 15px -3px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 
-.shopping-item{
+.shopping-item {
   width: 116px;
   height: 116px;
   margin: 4px;
@@ -11,7 +14,7 @@
     padding-top: 0;
   }
 
-  .MuiIconButton-root.shopping-item__menu{
+  .MuiIconButton-root.shopping-item__menu {
     position: absolute;
     right: -4px;
     z-index: 10;
@@ -28,17 +31,31 @@
     background-position-y: 10%;
   }
 
-  &__actions{
+  @keyframes fadeOut {
+    0% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .MuiCardContent-root.shopping-item__content.animate-card {
+    /* Apply the animation to the desired element */
+    animation: fadeOut 0.5s ease-in-out;
+  }
+
+  &__actions {
     display: flex;
     width: 100%;
     align-items: center;
   }
 
-  .MuiIconButton-root.shopping-item__desc{
+  .MuiIconButton-root.shopping-item__desc {
     margin-left: auto;
   }
 
-  &__heading{
+  &__heading {
     color: white;
     font-size: 40px;
     opacity: 0.4;
@@ -48,4 +65,3 @@
     user-select: none;
   }
 }
-

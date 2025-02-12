@@ -58,6 +58,7 @@ const ShoppingListInternal = () => {
     shopItem: ShopItem;
   }>(null);
 
+  const [updatedShopItem, setUpdatedShopItem] = useState<string | null>(null);
   const { ingredientTypes } = useGetIngredientTypes();
   const { setIngredientType } = useSetIngredientType(category);
   const { addToShoppingList } = useAddToShoppingList(category);
@@ -97,6 +98,7 @@ const ShoppingListInternal = () => {
           return newShopItems;
         }
       );
+      updateShopItem(shopItem.id);
     },
     [category, queryClient]
   );
@@ -135,11 +137,21 @@ const ShoppingListInternal = () => {
   }
 
   const onSetIngredientType = async (ingredientTypeId: string | undefined) => {
+    const shopItem = { ...shopItemMenu?.shopItem };
     setShopItemMenu(null);
     await setIngredientType({
-      ingredientId: shopItemMenu?.shopItem?.ingredientId,
+      ingredientId: shopItem?.ingredientId,
       ingredientTypeId: ingredientTypeId
     });
+    updateShopItem(shopItem.id);
+  };
+
+  const updateShopItem = (id?: string) => {
+    if (!id) {
+      return;
+    }
+    setUpdatedShopItem(id);
+    setTimeout(() => setUpdatedShopItem(null), 600);
   };
 
   return (
@@ -176,6 +188,7 @@ const ShoppingListInternal = () => {
           ingredients={shopItems}
           haveBought={false}
           editingIngredient={editingIngredient}
+          updatedShopItem={updatedShopItem}
           setEditingIngredient={setEditingIngredient}
           onEditIngredient={onEditIngredient}
           toggleHaveBought={onToggleHaveBought}
@@ -188,6 +201,7 @@ const ShoppingListInternal = () => {
           ingredients={shopItems}
           haveBought={true}
           editingIngredient={editingIngredient}
+          updatedShopItem={updatedShopItem}
           setEditingIngredient={setEditingIngredient}
           onEditIngredient={onEditIngredient}
           toggleHaveBought={onToggleHaveBought}
@@ -204,6 +218,7 @@ const GroceryList = (props: {
   ingredients: ShopItem[];
   haveBought: boolean;
   editingIngredient: string;
+  updatedShopItem?: string | null;
   setEditingIngredient: (id: string) => void;
   toggleHaveBought: (id: string) => void;
   onEditIngredient: (ingredient: ShopItem) => void;
@@ -224,6 +239,7 @@ const GroceryList = (props: {
           )
           .map((grocery) => (
             <ShoppingItem
+              isRecentlyUpdated={props.updatedShopItem === grocery.id}
               shopItem={grocery}
               key={grocery.id}
               editIngredient={props.onEditIngredient}
