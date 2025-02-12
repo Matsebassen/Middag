@@ -70,17 +70,21 @@ export const useSetIngredientType = (categoryId: string) => {
     onSuccess: (result) => {
       queryClient.setQueryData(
         [SHOP_ITEMS_QUERY_KEY, categoryId],
-        (old: ShopItem[]) =>
-          old.map((shopItem) => {
-            if (shopItem.ingredientId === result.id) {
-              return {
-                ...shopItem,
-                ingredientTypeId: result.ingredientTypeId,
-                ingredientId: result.id
-              };
-            }
-            return { ...shopItem };
-          })
+        (old: ShopItem[]) => [
+          ...old
+            .map((shopItem) => {
+              if (shopItem.ingredientId === result.id) {
+                return {
+                  ...shopItem,
+                  ingredientTypeId: result.ingredientTypeId,
+                  ingredientId: result.id,
+                  order: result.order
+                };
+              }
+              return { ...shopItem };
+            })
+            .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+        ]
       );
     }
   });
