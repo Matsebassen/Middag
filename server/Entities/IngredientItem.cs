@@ -2,8 +2,9 @@ namespace MiddagApi.Models
 {
     public class IngredientItem
     {
-        public long ID { get; set; }
-        public string? Name { get; set; }
-        public IngredientType? ingredientType { get; set; }
+        public string id { get; set; }
+        public string? name { get; set; }
+        public string? ingredientTypeId { get; set; }
+        public long? order { get; set; }
     }
 }

@@ -1,9 +1,12 @@
 import { IngredientItem } from "./ingredient";
 
 export type ShopItem = {
-  id: number;
+  id: string;
   description?: string;
   recentlyUsed: number;
-  categoryId: number;
-  ingredientItem: IngredientItem;
+  categoryId: string;
+  ingredientId: string;
+  ingredientTypeId?: string;
+  name: string;
+  order?: number;
 };

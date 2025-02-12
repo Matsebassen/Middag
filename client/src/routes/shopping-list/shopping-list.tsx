@@ -49,8 +49,8 @@ const ShoppingListInternal = () => {
   const queryClient = useQueryClient();
   const { connection } = useSignalR();
   const [ingredientInput, setIngredientInput] = useState("");
-  const [editingIngredient, setEditingIngredient] = useState(0);
-  const [category, setCategory] = useState(1);
+  const [editingIngredient, setEditingIngredient] = useState("0");
+  const [category, setCategory] = useState("1");
   const { shopItems } = useFetchShopItems(category);
   const [loading, setLoading] = useState(false);
   const [shopItemMenu, setShopItemMenu] = useState<null | {
@@ -66,7 +66,7 @@ const ShoppingListInternal = () => {
 
   const onEditIngredient = async (shopItem: ShopItem) => {
     setLoading(true);
-    setEditingIngredient(0);
+    setEditingIngredient("0");
     const modifiedShopItem = await editIngredient(shopItem);
     mutateShopItemAdd(modifiedShopItem);
     setLoading(false);
@@ -123,7 +123,7 @@ const ShoppingListInternal = () => {
     };
   }, [connection, onToggled]);
 
-  const onToggleHaveBought = async (id: number) => {
+  const onToggleHaveBought = async (id: string) => {
     setLoading(true);
     const shopItem = await toggleShopItem(id);
     mutateShopItemAdd(shopItem);
@@ -134,10 +134,10 @@ const ShoppingListInternal = () => {
     setShopItemMenu(null);
   }
 
-  const onSetIngredientType = async (ingredientTypeId: number | undefined) => {
+  const onSetIngredientType = async (ingredientTypeId: string | undefined) => {
     setShopItemMenu(null);
     await setIngredientType({
-      ingredientId: shopItemMenu?.shopItem?.ingredientItem.id,
+      ingredientId: shopItemMenu?.shopItem?.ingredientId,
       ingredientTypeId: ingredientTypeId
     });
   };
@@ -203,9 +203,9 @@ const ShoppingListInternal = () => {
 const GroceryList = (props: {
   ingredients: ShopItem[];
   haveBought: boolean;
-  editingIngredient: number;
-  setEditingIngredient: (id: number) => void;
-  toggleHaveBought: (id: number) => void;
+  editingIngredient: string;
+  setEditingIngredient: (id: string) => void;
+  toggleHaveBought: (id: string) => void;
   onEditIngredient: (ingredient: ShopItem) => void;
   openMenu: (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -220,7 +220,7 @@ const GroceryList = (props: {
           .sort((a, b) =>
             props.haveBought
               ? b.recentlyUsed - a.recentlyUsed
-              : (a.ingredientItem.order ?? 99) - (b.ingredientItem.order ?? 99)
+              : (a.order ?? 99) - (b.order ?? 99)
           )
           .map((grocery) => (
             <ShoppingItem

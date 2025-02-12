@@ -29,7 +29,7 @@ export const DinnerForm = (props: {
     <div>
       <Formik
         initialValues={{
-          id: dinner?.id || 0,
+          id: dinner?.id || "",
           name: dinner?.name || "",
           picUrl: dinner?.picUrl || "",
           portions: dinner?.portions || "",
@@ -109,7 +109,7 @@ const DinnerFormikForm = () => {
                 values?.ingredients.map((ingredient, index) => (
                   <div key={index} className="add-dinner__form-ingredients">
                     <Field
-                      name={`ingredients[${index}].ingredient.name`}
+                      name={`ingredients[${index}].name`}
                       component={FormikTextField}
                       InputLabelProps={{ shrink: true }}
                       style={{ flex: "2 2 auto", marginRight: "8px" }}

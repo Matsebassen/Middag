@@ -8,6 +8,6 @@ export const editIngredient = (shopItem: ShopItem): Promise<ShopItem> => {
     .then((res) => res.data);
 };
 
-export const toggleShopItem = (id: number): Promise<ShopItem> => {
+export const toggleShopItem = (id: string): Promise<ShopItem> => {
   return axios.patch(`${API}/ShopItems/toggle/${id}`).then((res) => res.data);
 };

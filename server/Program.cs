@@ -27,7 +27,8 @@ MappingConfig.ConfigureMappings();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<DinnerContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("Middagdb")));
+    opt.UseCosmos(builder.Configuration.GetConnectionString("Cosmosdb"), "middag"));
+    //opt.UseSqlServer(builder.Configuration.GetConnectionString("Middagdb")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -56,7 +57,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<DinnerContext>();
-    context.Database.EnsureCreated();
+    await context.Database.EnsureCreatedAsync();
     //DbInitializer.Initialize(context);
 }
 
